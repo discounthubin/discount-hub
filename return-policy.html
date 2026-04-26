@@ -1,0 +1,223 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Policy - Discount Hub</title>
+    <link rel="icon" href="dh.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Base Styles (Consistent) --- */
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4d44db;
+            --accent-color: #ff6584;
+            --dark-color: #2d2d2d;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.7;
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- Button Styles --- */
+        .btn {
+            display: inline-block; background-color: var(--primary-color); color: var(--white);
+            padding: 10px 25px; border: none; border-radius: 30px; cursor: pointer;
+            text-decoration: none; font-weight: 500; font-size: 15px; transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center;
+        }
+        .btn i { margin-right: 8px; }
+        .btn:hover { background-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); }
+
+
+        /* --- Navbar Styles (Minimal) --- */
+        .navbar { background-color: var(--white); box-shadow: var(--box-shadow); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; height: 60px; max-width: 1200px; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-color); text-decoration: none; white-space: nowrap; }
+         .nav-links { display: none; align-items: center; gap: 10px;} /* Placeholder */
+        .nav-links a { text-decoration: none; color: var(--dark-color); font-weight: 500; font-size: 14px; padding: 5px 8px; border-radius: 5px;}
+        .nav-links a:hover { color: var(--primary-color); background-color: var(--light-gray); }
+        .mobile-menu-btn, .cart-icon, .search-bar { display: none; } /* Hidden on this page */
+
+        /* --- Content Section --- */
+        .content-section {
+            padding-top: 100px; /* Space for fixed navbar */
+            padding-bottom: 60px;
+            flex-grow: 1;
+        }
+
+        .content-section h1 {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .content-card {
+            background-color: var(--white);
+            padding: 30px 35px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .content-block {
+            margin-bottom: 25px;
+        }
+        .content-block:last-child { margin-bottom: 0; }
+
+        .content-block h3 {
+            font-size: 20px;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .content-block p {
+            font-size: 16px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+         .content-block p:last-child { margin-bottom: 0; }
+
+         .content-block ul {
+            list-style: disc; /* Standard bullets for policy details */
+            padding-left: 20px; /* Standard padding */
+            font-size: 16px;
+            color: var(--dark-color);
+         }
+         .content-block ul li {
+             margin-bottom: 10px;
+         }
+
+         .policy-highlight {
+             font-weight: 600;
+             color: var(--danger-color); /* Highlight important policy points */
+         }
+         .policy-note {
+             font-style: italic;
+             color: var(--gray-color);
+             font-size: 14px;
+             margin-top: 15px;
+         }
+
+         .initiate-return-cta {
+             text-align: center;
+             margin-top: 40px;
+         }
+
+
+        /* --- Footer Styles --- */
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 18px 0; margin-top: 40px; text-align: center; font-size: 13px; }
+
+        /* --- Responsive --- */
+         @media (max-width: 768px) {
+            .content-section h1 { font-size: 28px; }
+            .content-block h3 { font-size: 18px; }
+            .content-block p, .content-block ul, .content-block ul li { font-size: 15px; }
+        }
+        @media (max-width: 576px) {
+             .content-section h1 { font-size: 24px; margin-bottom: 15px;}
+             .content-card { padding: 25px 20px; }
+             .content-block h3 { font-size: 16px; margin-bottom: 8px; }
+             .content-block p, .content-block ul, .content-block ul li { font-size: 14px; margin-bottom: 8px;}
+             .content-block ul { padding-left: 15px; }
+             .btn { width: 100%; padding: 12px 20px; font-size: 15px;}
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Discount Hub</a>
+             <!-- Minimal Navbar -->
+            <div class="nav-links">
+                 <a href="index.html">Home</a>
+                 <a href="contact.html">Contact</a>
+                 <a href="about.html">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Return Policy Section -->
+    <main class="content-section">
+        <div class="container">
+            <h1>Return Policy</h1>
+
+            <div class="content-card">
+                <div class="content-block">
+                    <h3>Eligibility for Returns</h3>
+                    <p>We carefully check and verify every product before shipping to ensure quality. We only accept returns under specific conditions:</p>
+                    <ul>
+                        <li>The product received is <strong class="policy-highlight">wrong</strong> (not what you ordered).</li>
+                        <li>The product received is <strong class="policy-highlight">defective</strong> or damaged upon arrival (requires unboxing video proof).</li>
+                    </ul>
+                    <p class="policy-note">Returns based on change of mind, dislike of the product, or minor cosmetic variations not affecting functionality are generally not accepted.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Return Window</h3>
+                    <p>You must initiate the return process within <strong class="policy-highlight">8 days</strong> of the delivery date of your order.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Return Processing Fee</h3>
+                    <p>A return processing fee of <strong class="policy-highlight">₹99</strong> is applicable for all accepted returns. This fee covers handling and logistics.</p>
+                     <p>The fee is either paid in advance during the return initiation process or will be deducted from your refund amount.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>How to Initiate a Return</h3>
+                    <p>If your order meets the eligibility criteria, please visit our dedicated return initiation page:</p>
+                     <div class="initiate-return-cta">
+                          <a href="return-payment.html" class="btn"><i class="fas fa-arrow-right"></i> Initiate Return Process</a>
+                     </div>
+                    <p class="policy-note">You will be guided through the necessary steps, including fee payment and submitting a request form.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Refund Process</h3>
+                    <p>Once your return request is approved and the returned product is received and inspected:</p>
+                     <ul>
+                         <li>The refund (minus the ₹99 fee if not paid upfront) will be processed.</li>
+                         <li>Refunds are typically issued within 7-10 business days to your original payment method or provided bank account.</li>
+                         <li>You will be notified via email or message regarding the status of your refund.</li>
+                     </ul>
+                </div>
+                 <div class="content-block">
+                    <h3>Contact Us</h3>
+                    <p>If you have questions about our Return Policy, you can contact our support team via our <a href="contact.html" style="color: var(--primary-color); font-weight: 500;">Contact Us page</a>.</p>
+                 </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2024 Discount Hub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html

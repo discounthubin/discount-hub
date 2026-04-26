@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Track Order - Discount Hub</title>
+    <link rel="icon" href="dh.png" type="image/png">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --primary: #4F46E5; 
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --gray: #e2e8f0; 
+            --text: #0f172a; 
+            --bg: #f8fafc; 
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); padding-bottom: 50px; }
+        
+        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; position: relative; }
+        
+        /* HEADER */
+        .header { 
+            position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 15px 20px; border-bottom: 1px solid var(--gray); z-index: 100; display: flex; align-items: center; gap: 15px;
+        }
+        .back-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text); }
+        .page-title { font-weight: 800; font-size: 1.1rem; margin: 0; }
+
+        /* PRODUCT SUMMARY */
+        .product-section { padding: 20px; border-bottom: 8px solid #f1f5f9; }
+        .prod-card { display: flex; gap: 15px; }
+        .prod-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; }
+        .prod-info h3 { margin: 0 0 5px; font-size: 1rem; font-weight: 700; line-height: 1.3; }
+        .prod-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
+        .order-id-tag { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 600; }
+
+        /* TIMELINE STYLES (Vertical) */
+        .tracking-section { padding: 25px 20px; }
+        .section-head { font-size: 1rem; font-weight: 800; margin-bottom: 20px; }
+
+        .timeline { position: relative; padding-left: 10px; }
+        
+        /* The Vertical Line */
+        .line-bg { 
+            position: absolute; left: 19px; top: 10px; bottom: 40px; 
+            width: 2px; background: #e2e8f0; z-index: 0; 
+        }
+        .line-progress { 
+            position: absolute; left: 19px; top: 10px; 
+            width: 2px; background: var(--success); z-index: 1; 
+            height: 0%; transition: height 1s ease-in-out; 
+        }
+
+        .step { position: relative; padding-left: 45px; padding-bottom: 35px; z-index: 2; }
+        .step:last-child { padding-bottom: 0; }
+        
+        /* Dot Styling */
+        .step-dot { 
+            position: absolute; left: 10px; top: 0; width: 20px; height: 20px; 
+            border-radius: 50%; background: white; border: 4px solid #cbd5e1; 
+            transition: 0.4s; z-index: 2; 
+        }
+        
+        /* Active/Completed State */
+        .step.completed .step-dot { border-color: var(--success); background: var(--success); }
+        .step.active .step-dot { border-color: var(--success); background: var(--success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        
+        .step-title { font-weight: 700; font-size: 0.95rem; color: #94a3b8; transition: 0.3s; }
+        .step.completed .step-title, .step.active .step-title { color: var(--text); }
+        
+        .step-date { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+        
+        /* Dynamic Location Badge */
+        .step-location { 
+            font-size: 0.75rem; color: var(--primary); font-weight: 600; 
+            background: #e0e7ff; padding: 3px 8px; border-radius: 4px; 
+            margin-top: 5px; display: inline-block; 
+        }
+
+        /* CANCELLED VIEW */
+        .cancelled-view { text-align: center; padding: 40px 20px; display: none; }
+        .cancel-icon { font-size: 3rem; color: var(--danger); margin-bottom: 15px; }
+        .shop-btn { 
+            background: var(--primary); color: white; padding: 12px 25px; 
+            border-radius: 25px; text-decoration: none; font-weight: 600; 
+            display: inline-block; margin-top: 20px; 
+        }
+
+        /* RELATED PRODUCTS */
+        .related-section { padding: 20px; background: #f8fafc; }
+        .related-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scroll-behavior: smooth; }
+        .related-scroll::-webkit-scrollbar { display: none; }
+        
+        .related-card { 
+            min-width: 140px; width: 140px; background: white; border: 1px solid var(--gray); 
+            border-radius: 12px; overflow: hidden; cursor: pointer; 
+        }
+        .r-img { width: 100%; height: 140px; object-fit: cover; }
+        .r-info { padding: 10px; }
+        .r-name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .r-price { font-size: 0.8rem; color: var(--primary); font-weight: 700; }
+
+        /* LOADING */
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; display: flex; align-items: center; justify-content: center; }
+        .spinner { width: 35px; height: 35px; border: 3px solid #e0e7ff; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOADER -->
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="mainContent" style="display: none;">
+        <div class="header">
+            <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+            <h1 class="page-title">Track Shipment</h1>
+        </div>
+
+        <div class="product-section">
+            <div class="prod-card">
+                <img id="p-img" src="" class="prod-img">
+                <div class="prod-info">
+                    <h3 id="p-name">Loading...</h3>
+                    <p>Order ID: <span id="p-oid" class="order-id-tag">#...</span></p>
+                    <p style="margin-top:5px; color:var(--success); font-weight:600;" id="est-delivery">Est. Delivery: Calculating...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRACKING TIMELINE -->
+        <div class="tracking-section" id="timelineView">
+            <h3 class="section-head">Order Status</h3>
+            
+            <div class="timeline">
+                <div class="line-bg"></div>
+                <div class="line-progress" id="progressBar"></div>
+
+                <!-- 1. PLACED -->
+                <div class="step" id="status-Placed">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Order Placed</div>
+                    <div class="step-date"></div>
+                </div>
+
+                <!-- 2. PACKED -->
+                <div class="step" id="status-Packed">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Packed</div>
+                    <div class="step-date"></div>
+                </div>
+
+                <!-- 3. SHIPPED (Gurgaon) -->
+                <div class="step" id="status-Shipped">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Shipped</div>
+                    <div class="step-date"></div>
+                    <div class="step-location" id="loc-origin" style="display:none">Gurgaon Central Hub</div>
+                </div>
+
+                <!-- 4. IN TRANSIT (State Capital Logic) -->
+                <div class="step" id="status-In-Transit">
+                    <div class="step-dot"></div>
+                    <div class="step-title">In Transit</div>
+                    <div class="step-date"></div>
+                    <div class="step-location" id="loc-state" style="display:none"></div>
+                </div>
+
+                <!-- 5. REACHED DESTINATION HUB (User City) -->
+                <div class="step" id="status-Reached-at-Destination-Hub">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Reached at Destination Hub</div>
+                    <div class="step-date"></div>
+                    <div class="step-location" id="loc-city" style="display:none"></div>
+                </div>
+
+                <!-- 6. OUT FOR DELIVERY (User Address) -->
+                <div class="step" id="status-Out-for-Delivery">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Out for Delivery</div>
+                    <div class="step-date"></div>
+                    <div class="step-location" id="loc-area" style="display:none"></div>
+                </div>
+
+                <!-- 7. DELIVERED -->
+                <div class="step" id="status-Delivered">
+                    <div class="step-dot"></div>
+                    <div class="step-title">Delivered</div>
+                    <div class="step-date"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CANCELLED VIEW -->
+        <div class="cancelled-view" id="cancelledView">
+            <i class="fas fa-box-open cancel-icon"></i>
+            <h2>Order Cancelled</h2>
+            <p style="color:#64748b;">This order was cancelled. Don't worry, we have plenty more amazing products!</p>
+            <a href="index.html" class="shop-btn">Continue Shopping</a>
+        </div>
+
+        <!-- RELATED PRODUCTS -->
+        <div class="related-section">
+            <div class="related-header">More to Explore</div>
+            <div class="related-scroll" id="related-container"></div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, limit, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+      authDomain: "discounthubadmin.firebaseapp.com",
+      projectId: "discounthubadmin",
+      storageBucket: "discounthubadmin.firebasestorage.app",
+      messagingSenderId: "610110627519",
+      appId: "1:610110627519:web:0593a19ddc34fb669ef00a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // --- STATE CAPITAL MAP (For Realism) ---
+    const STATE_CAPITALS = {
+        "Andhra Pradesh": "Amaravati Hub",
+        "Arunachal Pradesh": "Itanagar Hub",
+        "Assam": "Guwahati Hub",
+        "Bihar": "Patna Central Hub",
+        "Chhattisgarh": "Raipur Hub",
+        "Goa": "Panaji Hub",
+        "Gujarat": "Ahmedabad Hub",
+        "Haryana": "Gurgaon Hub",
+        "Himachal Pradesh": "Shimla Hub",
+        "Jharkhand": "Ranchi Hub",
+        "Karnataka": "Bangalore Hub",
+        "Kerala": "Kochi Hub",
+        "Madhya Pradesh": "Bhopal Hub",
+        "Maharashtra": "Mumbai Central Hub",
+        "Manipur": "Imphal Hub",
+        "Meghalaya": "Shillong Hub",
+        "Mizoram": "Aizawl Hub",
+        "Nagaland": "Kohima Hub",
+        "Odisha": "Bhubaneswar Hub",
+        "Punjab": "Chandigarh Hub",
+        "Rajasthan": "Jaipur Hub",
+        "Sikkim": "Gangtok Hub",
+        "Tamil Nadu": "Chennai Hub",
+        "Telangana": "Hyderabad Hub",
+        "Tripura": "Agartala Hub",
+        "Uttar Pradesh": "Lucknow Central Hub",
+        "Uttarakhand": "Dehradun Hub",
+        "West Bengal": "Kolkata Hub",
+        "Delhi": "New Delhi Hub"
+    };
+
+    // --- MAIN LOGIC ---
+    let currentUserId = null;
+
+    window.onload = () => {
+        onAuthStateChanged(auth, (user) => {
+            currentUserId = user ? user.uid : localStorage.getItem('dh_guest_id');
+            if(currentUserId) {
+                initPage();
+            } else {
+                alert("Please login to track orders");
+                window.location.href = 'index.html';
+            }
+        });
+    };
+
+    async function initPage() {
+        const params = new URLSearchParams(window.location.search);
+        let orderId = params.get('orderId'); 
+        if(!orderId) orderId = params.get('id'); // Fallback
+
+        if (!orderId) { alert("Invalid Order ID"); window.history.back(); return; }
+
+        try {
+            const docRef = doc(db, "orders", orderId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+
+                // 1. SECURITY CHECK
+                if (data.userId !== currentUserId) {
+                    alert("Unauthorized Access!");
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                renderPage(data, orderId);
+                loadRelated();
+            } else {
+                alert("Order Not Found");
+                window.history.back();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function renderPage(data, id) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+
+        // 1. Product Info
+        const item = data.items[0];
+        document.getElementById('p-img').src = item.image || item.thumbnailURL || "https://placehold.co/100";
+        document.getElementById('p-name').innerText = item.productName;
+        document.getElementById('p-oid').innerText = "#" + (data.orderId || id.slice(0,8).toUpperCase());
+
+        // 2. Cancellation Check
+        if(data.status === 'Cancelled') {
+            document.getElementById('timelineView').style.display = 'none';
+            document.getElementById('cancelledView').style.display = 'block';
+            document.getElementById('est-delivery').innerHTML = `<span style="color:var(--danger)">Cancelled</span>`;
+            return;
+        }
+
+        // 3. Est Delivery Calculation (Order Date + 5 to 7 days)
+        const orderDate = data.createdAt ? data.createdAt.toDate() : new Date();
+        const estDate = new Date(orderDate);
+        estDate.setDate(estDate.getDate() + 5); // Default 5 days
+        document.getElementById('p-date').innerText = estDate.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+
+        // 4. TIMELINE LOGIC
+        const steps = [
+            'Placed', 
+            'Packed', 
+            'Shipped', 
+            'In Transit', 
+            'Reached at Destination Hub', 
+            'Out for Delivery', 
+            'Delivered'
+        ];
+
+        let currentStatus = data.status || 'Placed';
+        // Normalize status string just in case
+        if(currentStatus === 'In Transit') currentStatus = 'In Transit'; 
+
+        let currentIndex = steps.indexOf(currentStatus);
+        if(currentIndex === -1) currentIndex = 0; // Default if mismatch
+
+        // Progress Bar Height
+        const progressHeight = (currentIndex / (steps.length - 1)) * 100;
+        setTimeout(() => {
+            document.getElementById('progressBar').style.height = progressHeight + "%";
+        }, 500);
+
+        // Render Steps
+        steps.forEach((stepName, index) => {
+            // Convert status string to ID format (e.g. "In Transit" -> "In-Transit")
+            const stepId = "status-" + stepName.replace(/\s+/g, '-');
+            const stepEl = document.getElementById(stepId);
+
+            if(index <= currentIndex) {
+                stepEl.classList.add('active'); // Current or Passed
+                if(index < currentIndex) stepEl.classList.add('completed'); // Passed
+            }
+
+            // Find Timestamp from Logs
+            const logEntry = data.statusLog?.find(l => l.status === stepName);
+            const timeDiv = stepEl.querySelector('.step-date');
+            
+            if(logEntry) {
+                const date = logEntry.at.toDate ? logEntry.at.toDate() : new Date(logEntry.at);
+                timeDiv.innerText = date.toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            } else if(index === 0) {
+                // For Placed, use createdAt if no log
+                timeDiv.innerText = orderDate.toLocaleString('en-IN', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            }
+
+            // DYNAMIC LOCATIONS (Show only if Active/Completed)
+            if(index <= currentIndex) {
+                const address = data.address || {};
+                
+                // Shipped Origin
+                if(stepName === 'Shipped') {
+                    document.getElementById('loc-origin').style.display = 'inline-block';
+                }
+
+                // In Transit (State Capital)
+                if(stepName === 'In Transit') {
+                    const stateName = address.state || '';
+                    const hubName = STATE_CAPITALS[stateName] || `${stateName} Central Hub`;
+                    const locEl = document.getElementById('loc-state');
+                    locEl.innerText = hubName;
+                    locEl.style.display = 'inline-block';
+                }
+
+                // Reached Destination (User City)
+                if(stepName === 'Reached at Destination Hub') {
+                    const locEl = document.getElementById('loc-city');
+                    locEl.innerText = `${address.city} Hub - ${address.pincode}`;
+                    locEl.style.display = 'inline-block';
+                }
+
+                // Out for Delivery (User Address Area)
+                if(stepName === 'Out for Delivery') {
+                    const locEl = document.getElementById('loc-area');
+                    // Show short address
+                    const shortAddr = address.address ? address.address.substring(0, 25) + "..." : "Local Area";
+                    locEl.innerText = `To: ${shortAddr}`;
+                    locEl.style.display = 'inline-block';
+                }
+            }
+        });
+    }
+
+    async function loadRelated() {
+        const container = document.getElementById('related-container');
+        const q = query(collection(db, "products"), limit(6));
+        const snap = await getDocs(q);
+        
+        container.innerHTML = '';
+        snap.forEach(doc => {
+            const p = doc.data();
+            const url = p.slug ? `product.html?id=${p.slug}` : '#';
+            container.innerHTML += `
+                <div class="related-card" onclick="window.location.href='${url}'">
+                    <img src="${p.poster || p.image || 'https://placehold.co/150'}" class="r-img">
+                    <div class="r-info">
+                        <div class="r-name">${p.name}</div>
+                        <div class="r-price">₹${p.price}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>

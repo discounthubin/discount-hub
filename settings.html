@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Account - Discount Hub</title>
+<link rel="icon" href="dh.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<style>
+:root{
+  --pr:#6c63ff;--prd:#4f46e5;--prl:#ede9fe;
+  --ok:#10b981;--er:#ef4444;--wa:#f59e0b;
+  --bg:#f1f5f9;--sf:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e8f0;
+  --rs:10px;--rm:18px;
+  --ss:0 1px 4px rgba(0,0,0,.06);--sm:0 6px 24px rgba(0,0,0,.08);--sl:0 20px 60px rgba(0,0,0,.14);
+  --fh:"Syne",sans-serif;--fb:"DM Sans",sans-serif;--nv:60px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--bg);color:var(--tx);overflow-x:hidden;padding-top:var(--nv);padding-bottom:90px;}
+@media(min-width:768px){body{padding-bottom:40px;}}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;border:none;font-family:inherit;background:none;}
+
+/* LOADER */
+#pgLoad{position:fixed;inset:0;background:#fff;z-index:7000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .4s;}
+#pgLoad.out{opacity:0;pointer-events:none;}
+.dl{position:relative;width:72px;height:82px;animation:fb 2s ease-in-out infinite;}
+.dl::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:26px;border:4px solid #0f172a;border-bottom:none;border-radius:18px 18px 0 0;z-index:1;}
+.db{position:absolute;bottom:0;left:0;width:100%;height:68px;background:linear-gradient(135deg,var(--pr),#a78bfa);border-radius:12px;box-shadow:0 8px 18px rgba(108,99,255,.3);display:flex;align-items:center;justify-content:center;z-index:2;}
+.ds{width:44px;height:44px;fill:none;}
+.dt{stroke:rgba(255,255,255,.2);stroke-width:5;stroke-linecap:round;}
+.dp{stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-dasharray:110;stroke-dashoffset:110;animation:dd 1.5s ease-in-out infinite;filter:drop-shadow(0 0 2px rgba(255,255,255,.8));}
+.lt{font-family:var(--fh);font-weight:600;color:#334155;font-size:1rem;}
+@keyframes fb{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+@keyframes dd{0%{stroke-dashoffset:110;}50%{stroke-dashoffset:0;}100%{stroke-dashoffset:-110;}}
+
+/* NAVBAR */
+.navbar{background:rgba(255,255,255,.97);backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(0,0,0,.06),0 4px 20px rgba(0,0,0,.04);position:fixed;top:0;width:100%;z-index:1000;height:var(--nv);}
+.nav-in{max-width:580px;margin:0 auto;padding:0 16px;height:100%;display:flex;align-items:center;justify-content:space-between;}
+.nav-bk{width:34px;height:34px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--tx);transition:.2s;border:none;cursor:pointer;}
+.nav-bk:hover{background:var(--prl);color:var(--pr);}
+.nav-bk.hd{visibility:hidden;}
+.logo{font-family:var(--fh);font-size:1.25rem;font-weight:800;color:var(--pr);letter-spacing:-.5px;}
+.nav-sp{width:34px;}
+
+/* LAYOUT */
+.main{max-width:520px;margin:18px auto 0;padding:0 14px;}
+
+/* VIEWS */
+.vw{display:none;}
+.vw.on{display:block;animation:vi .32s cubic-bezier(.22,1,.36,1) forwards;}
+@keyframes vi{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARD */
+.cd{background:var(--sf);border-radius:var(--rm);box-shadow:var(--ss);padding:20px;margin-bottom:12px;}
+.ptitle{font-family:var(--fh);font-size:1.45rem;font-weight:800;margin-bottom:18px;color:var(--tx);letter-spacing:-.5px;}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px;border-radius:var(--rm);font-weight:700;font-size:.93rem;transition:all .2s;gap:9px;font-family:var(--fb);cursor:pointer;border:none;outline:none;line-height:1;}
+.btn:active{transform:scale(.98);}
+.btn-p{background:linear-gradient(135deg,var(--pr),var(--prd));color:#fff;box-shadow:0 4px 14px rgba(108,99,255,.32);}
+.btn-g{background:#fff;border:1.5px solid var(--bd);color:var(--tx);font-weight:500;}
+.btn-s{background:var(--sf);border:1.5px solid var(--bd);color:var(--tx);}
+.btn-e{background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;}
+.btn-ok{background:#dcfce7;border:1.5px solid #bbf7d0;color:#15803d;}
+.btn-sm{padding:8px 14px;font-size:.8rem;width:auto;border-radius:9px;}
+
+/* FORM */
+.fg{position:relative;margin-bottom:16px;}
+.fi{width:100%;padding:15px 15px 9px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#f8fafc;font-size:.95rem;font-family:var(--fb);transition:all .2s;outline:none;color:var(--tx);}
+.fi:focus{border-color:var(--pr);background:#fff;box-shadow:0 0 0 4px var(--prl);}
+.fl{position:absolute;left:13px;top:13px;color:var(--mu);font-size:.93rem;pointer-events:none;transition:.2s;}
+.fi:focus ~ .fl,
+.fi:not(:placeholder-shown) ~ .fl{top:-7px;left:9px;font-size:.7rem;color:var(--pr);font-weight:700;background:var(--sf);padding:0 5px;border-radius:3px;}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;background-size:17px;}
+textarea.fi{resize:vertical;min-height:84px;}
+
+/* AUTH */
+.auth-hero{text-align:center;padding:24px 0 18px;}
+.auth-logo{width:62px;height:62px;border-radius:18px;background:linear-gradient(135deg,var(--pr),#a78bfa);display:flex;align-items:center;justify-content:center;margin:0 auto 13px;box-shadow:0 7px 20px rgba(108,99,255,.32);}
+.auth-logo i{color:#fff;font-size:1.6rem;}
+.auth-hero h2{font-family:var(--fh);font-size:1.65rem;font-weight:800;color:var(--tx);margin-bottom:4px;letter-spacing:-.5px;}
+.auth-hero p{color:var(--mu);font-size:.82rem;line-height:1.5;max-width:240px;margin:0 auto;}
+
+/* LIMIT BANNER */
+.lim-ban{background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fcd34d;border-radius:var(--rs);padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:#92400e;font-weight:500;}
+.lim-ban i{color:var(--wa);flex-shrink:0;}
+
+/* PHONE INPUT */
+.ph-row{display:flex;align-items:center;border:1.5px solid var(--bd);border-radius:var(--rs);background:#f8fafc;overflow:hidden;transition:.2s;}
+.ph-row:focus-within{border-color:var(--pr);background:#fff;box-shadow:0 0 0 4px var(--prl);}
+.ph-flag{padding:0 12px;display:flex;align-items:center;gap:5px;border-right:1.5px solid var(--bd);height:50px;font-weight:700;font-size:.88rem;color:var(--tx);white-space:nowrap;flex-shrink:0;}
+.ph-num{flex:1;border:none;background:transparent;padding:14px 12px;font-size:1rem;font-family:var(--fb);font-weight:600;color:var(--tx);outline:none;letter-spacing:.5px;}
+.ph-num::placeholder{color:#b0bac6;font-weight:400;letter-spacing:0;}
+
+/* OTP */
+.otp-sec{display:none;}
+.otp-sec.on{display:block;animation:vi .28s ease;}
+.otp-hint{font-size:.86rem;color:var(--mu);margin-bottom:14px;text-align:center;line-height:1.5;}
+.otp-hint strong{color:var(--tx);font-size:.92rem;}
+.otp-boxes{display:flex;gap:7px;justify-content:center;margin-bottom:18px;}
+.otp-box{width:44px;height:54px;border:2px solid var(--bd);border-radius:var(--rs);text-align:center;font-size:1.4rem;font-weight:700;font-family:var(--fh);color:var(--tx);background:#f8fafc;outline:none;transition:.2s;caret-color:var(--pr);}
+.otp-box:focus{border-color:var(--pr);background:#fff;box-shadow:0 0 0 3px var(--prl);}
+.otp-box.filled{border-color:var(--pr);background:var(--prl);}
+.otp-box.err{border-color:var(--er);background:#fef2f2;animation:shake .3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+.otp-resend{text-align:center;font-size:.8rem;color:var(--mu);margin-top:8px;}
+.resend-btn{color:var(--pr);font-weight:700;cursor:pointer;font-family:var(--fb);font-size:.8rem;background:none;border:none;}
+.resend-btn:disabled{color:var(--mu);cursor:default;}
+
+/* GOOGLE SUGGEST */
+.g-suggest{background:linear-gradient(135deg,rgba(108,99,255,.06),rgba(164,122,250,.08));border:1.5px solid rgba(108,99,255,.18);border-radius:var(--rs);padding:11px 13px;margin-top:11px;display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--mu);}
+.g-suggest i{color:var(--pr);flex-shrink:0;}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--mu);font-size:.76rem;font-weight:600;letter-spacing:.05em;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--bd);}
+
+/* PHONE SECTION - limit hide */
+.ph-wrap{transition:all .3s ease;overflow:hidden;}
+.ph-wrap.hidden{max-height:0!important;opacity:0;pointer-events:none;margin:0;}
+
+#recaptcha-container{position:absolute;bottom:0;opacity:0;pointer-events:none;}
+
+/* DASHBOARD */
+.dash-hero{text-align:center;padding:28px 20px 22px;position:relative;overflow:hidden;}
+.dash-hero::before{content:"";position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:260px;height:260px;border-radius:50%;background:radial-gradient(ellipse,rgba(108,99,255,.07),transparent 70%);pointer-events:none;}
+.av-wrap{width:86px;height:86px;border-radius:50%;position:relative;margin:0 auto 12px;cursor:pointer;transition:.2s;}
+.av-wrap:active{transform:scale(.95);}
+.av-img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:3px solid #fff;box-shadow:var(--sm);}
+.av-init{width:100%;height:100%;background:linear-gradient(135deg,var(--pr),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;font-weight:800;font-family:var(--fh);border-radius:50%;border:3px solid #fff;box-shadow:var(--sm);}
+.av-cam{position:absolute;bottom:2px;right:2px;background:var(--tx);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;border:2px solid #fff;}
+.dash-name{font-family:var(--fh);font-size:1.3rem;font-weight:800;color:var(--tx);margin-bottom:3px;}
+.dash-ph{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;color:var(--tx);font-weight:600;background:#f1f5f9;padding:4px 12px;border-radius:18px;margin-top:3px;}
+.dash-ph i{color:var(--pr);font-size:.75rem;}
+.v-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:var(--ok);font-weight:700;background:#dcfce7;padding:3px 9px;border-radius:18px;margin-top:7px;}
+
+/* Phone add banner on dashboard */
+.ph-add-ban{background:linear-gradient(135deg,rgba(108,99,255,.07),rgba(244,114,182,.06));border:1.5px solid rgba(108,99,255,.18);border-radius:var(--rs);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.2s;}
+.ph-add-ban:hover{border-color:var(--pr);}
+.ph-add-ban i.main{color:var(--pr);font-size:1.1rem;flex-shrink:0;}
+.ph-add-text strong{display:block;font-size:.83rem;font-weight:700;color:var(--tx);margin-bottom:1px;}
+.ph-add-text span{font-size:.75rem;color:var(--mu);}
+
+/* SETTINGS MENU */
+.s-list{list-style:none;padding:0;}
+.s-item{margin-bottom:1px;}
+.s-btn{width:100%;display:flex;align-items:center;padding:13px 9px;background:transparent;cursor:pointer;text-align:left;font-family:var(--fb);font-size:.93rem;font-weight:500;color:var(--tx);transition:.2s;border-radius:var(--rs);border:none;}
+.s-btn:hover{background:#f8fafc;color:var(--pr);}
+.s-icon{width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--prl);color:var(--pr);border-radius:9px;margin-right:12px;font-size:.95rem;transition:.2s;flex-shrink:0;}
+.s-btn:hover .s-icon{background:var(--pr);color:#fff;transform:scale(1.05);}
+.chev{margin-left:auto;color:#d1d5db;font-size:.75rem;}
+.logout-wrap{display:flex;justify-content:center;margin-top:20px;}
+.btn-lo{background:transparent;color:var(--mu);font-size:.85rem;font-weight:600;border:1.5px solid var(--bd);padding:8px 22px;border-radius:50px;display:inline-flex;align-items:center;gap:7px;transition:.2s;cursor:pointer;font-family:var(--fb);}
+.btn-lo:hover{color:var(--er);border-color:#fecaca;background:#fef2f2;}
+
+/* ADDRESS */
+.addr-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--rs);padding:14px;margin-bottom:11px;position:relative;transition:.2s;}
+.addr-card:hover{border-color:var(--pr);box-shadow:var(--ss);}
+.addr-tag{position:absolute;top:11px;right:11px;font-size:.66rem;font-weight:700;text-transform:uppercase;color:var(--pr);background:var(--prl);padding:2px 8px;border-radius:5px;}
+.addr-act{display:flex;gap:7px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--bd);}
+
+/* GEO BTN */
+.geo-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:12px;border-radius:var(--rs);background:linear-gradient(135deg,rgba(16,185,129,.07),rgba(5,150,105,.1));border:1.5px dashed rgba(16,185,129,.38);color:var(--ok);font-weight:700;font-size:.87rem;cursor:pointer;transition:.2s;margin-bottom:14px;font-family:var(--fb);}
+.geo-btn:hover{border-color:var(--ok);}
+.geo-btn:active{transform:scale(.98);}
+.geo-btn.ld{opacity:.7;cursor:not-allowed;}
+
+/* MOB NAV */
+.mob-nav{position:fixed;bottom:0;left:0;width:100%;height:68px;background:#fff;border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:6px;box-shadow:0 -4px 18px rgba(0,0,0,.04);}
+.m-item{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;color:#9ca3af;font-size:.66rem;font-weight:600;transition:.2s;flex:1;height:100%;gap:2px;}
+.m-item i{font-size:1.18rem;}
+.m-item.act{color:var(--pr);}
+@media(min-width:768px){.mob-nav{display:none;}}
+
+/* MODAL */
+.modal-ov{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.3s;backdrop-filter:blur(4px);}
+.modal-ov.on{opacity:1;visibility:visible;}
+.modal-bx{background:#fff;width:91%;max-width:400px;border-radius:var(--rm);overflow:hidden;transform:scale(.95);transition:.3s;}
+.modal-ov.on .modal-bx{transform:scale(1);}
+.crop-box{height:290px;background:#000;}
+
+/* TOAST */
+.toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(20px);background:#1f2937;color:#fff;padding:10px 20px;border-radius:50px;font-size:.84rem;font-weight:500;opacity:0;visibility:hidden;transition:.3s;z-index:3000;display:flex;align-items:center;gap:8px;box-shadow:var(--sl);width:max-content;max-width:88%;font-family:var(--fb);}
+.toast.on{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+.toast.ok i{color:var(--ok);}
+.toast.er i{color:var(--er);}
+.toast.wa i{color:var(--wa);}
+.toast.in i{color:#60a5fa;}
+</style>
+</head>
+<body>
+
+<div id="pgLoad">
+  <div class="dl">
+    <div class="db">
+      <svg class="ds" viewBox="0 0 40 40">
+        <path class="dt" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z"/>
+        <path class="dp" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z"/>
+      </svg>
+    </div>
+  </div>
+  <div class="lt">Loading...</div>
+</div>
+
+<nav class="navbar">
+  <div class="nav-in">
+    <button class="nav-bk hd" id="navBack"><i class="fas fa-arrow-left"></i></button>
+    <a href="index.html" class="logo">Discount Hub</a>
+    <div class="nav-sp"></div>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- AUTH VIEW -->
+  <div id="view-auth" class="vw">
+    <div class="auth-hero">
+      <div class="auth-logo"><i class="fas fa-bolt"></i></div>
+      <h2>Welcome Back</h2>
+      <p>Sign in to manage orders &amp; addresses</p>
+    </div>
+    <div class="cd">
+      <!-- PHONE SECTION — hidden when daily limit hit -->
+      <div class="ph-wrap" id="phWrap">
+        <div class="lim-ban" id="limBan" style="display:none;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Phone OTP limit reached for today. Please sign in with Google.</span>
+        </div>
+        <div id="step-phone">
+          <div class="fg" style="margin-bottom:12px;">
+            <div class="ph-row">
+              <div class="ph-flag">&#127470;&#127475; +91</div>
+              <input type="tel" id="phoneInput" class="ph-num" placeholder="10-digit number" maxlength="10" inputmode="numeric" pattern="[0-9]{10}">
+            </div>
+          </div>
+          <div id="recaptcha-container"></div>
+          <button class="btn btn-p" id="btnSendOtp"><i class="fas fa-paper-plane"></i> Send OTP</button>
+        </div>
+
+        <div class="otp-sec" id="step-otp">
+          <p class="otp-hint">OTP sent to <strong id="otpNum"></strong></p>
+          <div class="otp-boxes">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text" autocomplete="one-time-code">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text">
+            <input class="otp-box" maxlength="1" inputmode="numeric" type="text">
+          </div>
+          <button class="btn btn-p" id="btnVerify"><i class="fas fa-check-circle"></i> Verify &amp; Continue</button>
+          <div class="otp-resend" style="margin-top:10px;">
+            Didn't get it? <button class="resend-btn" id="btnResend" disabled>Resend in <span id="rtimer">1:30</span></button>
+          </div>
+          <button class="btn btn-s" id="btnChg" style="margin-top:9px;padding:10px;"><i class="fas fa-arrow-left"></i> Change Number</button>
+          <div class="g-suggest" id="gSuggest" style="display:none;">
+            <i class="fas fa-lightbulb"></i>
+            <span>Having trouble? <strong style="color:var(--pr);cursor:pointer;" id="suggestG">Try signing in with Google instead</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" id="orDiv">OR</div>
+      <button id="btnGoogle" class="btn btn-g">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" width="18"> Continue with Google
+      </button>
+    </div>
+  </div>
+
+  <!-- SETUP VIEW -->
+  <div id="view-setup" class="vw">
+    <h2 class="ptitle">One Last Step</h2>
+    <div class="cd">
+      <p style="color:var(--mu);margin-bottom:16px;font-size:.87rem;line-height:1.5;">Add your phone number for delivery updates.</p>
+      <form id="setupForm">
+        <div class="fg" id="sg-fname"><input type="text" class="fi" id="setupFName" placeholder=" " required><label class="fl">First Name</label></div>
+        <div class="fg" id="sg-lname"><input type="text" class="fi" id="setupLName" placeholder=" " required><label class="fl">Last Name</label></div>
+        <div class="fg"><input type="tel" class="fi" id="setupPhone" placeholder=" " pattern="[0-9]{10}"><label class="fl">Phone (for delivery updates)</label></div>
+        <div class="fg" id="sg-email" style="display:none;"><input type="email" class="fi" id="setupEmail" placeholder=" "><label class="fl">Email (Optional)</label></div>
+        <button type="submit" class="btn btn-p" style="margin-top:6px;"><i class="fas fa-arrow-right"></i> Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="vw">
+    <div class="ph-add-ban" id="phAddBan" style="display:none;" onclick="app.router('addresses')">
+      <i class="fas fa-mobile-alt main"></i>
+      <div class="ph-add-text" style="flex:1;">
+        <strong>Add Phone Number</strong>
+        <span>Required for delivery &amp; order tracking</span>
+      </div>
+      <i class="fas fa-chevron-right" style="color:var(--mu);font-size:.78rem;"></i>
+    </div>
+
+    <div class="cd dash-hero">
+      <div class="av-wrap" onclick="document.getElementById('upInput').click()">
+        <img id="dashAv" class="av-img" src="" style="display:none;">
+        <div id="dashIn" class="av-init">U</div>
+        <div class="av-cam"><i class="fas fa-camera"></i></div>
+      </div>
+      <div class="dash-name" id="dashName">Loading...</div>
+      <div class="dash-ph"><i class="fas fa-phone-alt"></i><span id="dashPh">---</span></div>
+      <div class="v-badge" id="vBadge" style="display:none;"><i class="fas fa-check-circle"></i> Phone Verified</div>
+    </div>
+
+    <div class="cd" style="padding:9px;">
+      <ul class="s-list">
+        <li class="s-item"><button class="s-btn" onclick="app.router('edit-profile')"><span class="s-icon"><i class="fas fa-user-pen"></i></span>Edit Profile<i class="fas fa-chevron-right chev"></i></button></li>
+        <li class="s-item"><button class="s-btn" onclick="app.router('addresses')"><span class="s-icon"><i class="fas fa-map-location-dot"></i></span>Manage Addresses<i class="fas fa-chevron-right chev"></i></button></li>
+        <li class="s-item"><a href="details.html" class="s-btn"><span class="s-icon"><i class="fas fa-box-open"></i></span>My Orders<i class="fas fa-chevron-right chev"></i></a></li>
+      </ul>
+    </div>
+
+    <div class="cd" style="padding:9px;">
+      <ul class="s-list">
+        <li class="s-item"><a href="contact.html" class="s-btn"><span class="s-icon" style="background:#ecfdf5;color:var(--ok);"><i class="fas fa-headset"></i></span>Help &amp; Support<i class="fas fa-chevron-right chev"></i></a></li>
+      </ul>
+    </div>
+
+    <div class="logout-wrap"><button id="btnLogout" class="btn-lo"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
+    <input type="file" id="upInput" accept="image/*" style="display:none;">
+  </div>
+
+  <!-- EDIT PROFILE -->
+  <div id="view-edit-profile" class="vw">
+    <h2 class="ptitle">Edit Profile</h2>
+    <div class="cd">
+      <form id="editForm">
+        <div class="fg"><input type="text" class="fi" id="eFN" placeholder=" " required><label class="fl">First Name</label></div>
+        <div class="fg"><input type="text" class="fi" id="eLN" placeholder=" " required><label class="fl">Last Name</label></div>
+        <div class="fg"><input type="email" class="fi" id="eEM" placeholder=" " readonly style="background:#f3f4f6;cursor:not-allowed;opacity:.7;"><label class="fl">Email (Cannot change)</label></div>
+        <div class="fg"><input type="tel" class="fi" id="ePH" placeholder=" " readonly style="background:#f3f4f6;cursor:not-allowed;opacity:.7;"><label class="fl">Phone (Verified)</label></div>
+        <div style="display:flex;gap:9px;margin-top:20px;">
+          <button type="button" class="btn btn-s" onclick="app.router('dashboard')">Cancel</button>
+          <button type="submit" class="btn btn-p">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADDRESSES -->
+  <div id="view-addresses" class="vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h2 class="ptitle" style="margin-bottom:0;font-size:1.3rem;">My Addresses</h2>
+      <button class="btn btn-p btn-sm" onclick="app.openAddrForm()"><i class="fas fa-plus"></i> Add New</button>
+    </div>
+    <div id="addrList"></div>
+    <div id="addrEmpty" style="text-align:center;padding:44px 0;display:none;">
+      <div style="background:#f1f5f9;width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><i class="fas fa-map-marked-alt" style="font-size:1.8rem;color:var(--mu);"></i></div>
+      <h3 style="font-size:.97rem;font-weight:700;margin-bottom:4px;">No Addresses</h3>
+      <p style="color:var(--mu);font-size:.84rem;">Add an address for faster checkout.</p>
+    </div>
+    <button class="btn btn-s" style="margin-top:14px;" onclick="app.router('dashboard')"><i class="fas fa-arrow-left"></i> Back</button>
+  </div>
+
+  <!-- ADDRESS FORM -->
+  <div id="view-address-form" class="vw">
+    <h2 class="ptitle" id="addrTitle">Add Address</h2>
+    <div class="cd">
+      <button class="geo-btn" id="geoBtn" onclick="doGeo()"><i class="fas fa-location-crosshairs"></i> Detect My Location</button>
+      <form id="addrForm">
+        <input type="hidden" id="addrIdx" value="-1">
+        <div class="fg"><input type="text" class="fi" id="aNm" placeholder=" " required><label class="fl">Full Name</label></div>
+        <div class="fg"><input type="tel" class="fi" id="aPh" placeholder=" " pattern="[0-9]{10}" required><label class="fl">Phone Number</label></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;">
+          <div class="fg" style="margin-bottom:0;position:relative;"><input type="text" class="fi" id="aPin" placeholder=" " pattern="[0-9]{6}" required><label class="fl">Pincode</label></div>
+          <div class="fg" style="margin-bottom:0;position:relative;"><input type="text" class="fi" id="aCt" placeholder=" " required><label class="fl">City</label></div>
+        </div>
+        <div class="fg"><select id="aSt" class="fi" required><option value="" disabled selected></option></select><label class="fl">State</label></div>
+        <div class="fg"><textarea id="aTx" class="fi" rows="3" placeholder=" " required></textarea><label class="fl">Address (Area, Street, House No)</label></div>
+        <div class="fg"><input type="text" class="fi" id="aLm" placeholder=" "><label class="fl">Landmark (Optional)</label></div>
+        <div style="display:flex;gap:9px;margin-top:20px;">
+          <button type="button" class="btn btn-s" onclick="app.router('addresses')">Cancel</button>
+          <button type="submit" class="btn btn-p">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<nav class="mob-nav">
+  <a href="index.html" class="m-item"><i class="fas fa-house"></i><span>Home</span></a>
+  <a href="index.html#showcase" class="m-item"><i class="fas fa-bag-shopping"></i><span>Shop</span></a>
+  <a href="details.html" class="m-item"><i class="fas fa-box-archive"></i><span>Orders</span></a>
+  <a href="settings.html" class="m-item act"><i class="fas fa-user"></i><span>Profile</span></a>
+</nav>
+
+<!-- CROPPER MODAL -->
+<div class="modal-ov" id="cropMo">
+  <div class="modal-bx">
+    <div style="padding:12px 15px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:var(--fh);font-size:.9rem;font-weight:700;">Adjust Image</span>
+      <button onclick="document.getElementById('cropMo').classList.remove('on')" style="font-size:1.3rem;color:var(--mu);">&times;</button>
+    </div>
+    <div class="crop-box"><img id="cropImg" src="" style="max-width:100%;"></div>
+    <div style="padding:12px;display:flex;gap:9px;justify-content:flex-end;">
+      <button class="btn btn-s btn-sm" id="rotBtn"><i class="fas fa-redo"></i></button>
+      <button class="btn btn-p btn-sm" id="saveBtn">Save Picture</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><i class="fas fa-info-circle"></i><span id="tMsg">Notification</span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPhoneNumber, RecaptchaVerifier,
+         signInWithPopup, GoogleAuthProvider, signOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const FB = initializeApp({
+  apiKey:"AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+  authDomain:"discounthubadmin.firebaseapp.com",
+  projectId:"discounthubadmin",
+  storageBucket:"discounthubadmin.firebasestorage.app",
+  messagingSenderId:"610110627519",
+  appId:"1:610110627519:web:0593a19ddc34fb669ef00a"
+});
+const auth = getAuth(FB), db = getFirestore(FB);
+
+let CU=null, UD=null, CR=null, resInt=null, croppr=null, otpFails=0;
+
+const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Jammu and Kashmir","Ladakh","Puducherry"];
+
+/* ── APP ── */
+const app = {
+  init() { app.fillStates(); app.listeners(); },
+
+  router(v) {
+    document.querySelectorAll(".vw").forEach(x => x.classList.remove("on"));
+    const t = document.getElementById("view-"+v);
+    if (t) t.classList.add("on");
+    window.scrollTo({ top:0, behavior:"smooth" });
+    const bk = document.getElementById("navBack");
+    const noBack = ["auth","dashboard"];
+    if (noBack.includes(v)) { bk.classList.add("hd"); }
+    else {
+      bk.classList.remove("hd");
+      const mp = { setup:"auth", "edit-profile":"dashboard", addresses:"dashboard", "address-form":"addresses" };
+      bk.onclick = () => app.router(mp[v] || "dashboard");
+    }
+  },
+
+  ld(s) { const e = document.getElementById("pgLoad"); s ? e.classList.remove("out") : e.classList.add("out"); },
+
+  toast(msg, type="ok") {
+    const t = document.getElementById("toast"), s = document.getElementById("tMsg");
+    s.textContent = msg; t.className = "toast on " + type;
+    const ic = { ok:"fas fa-check-circle", er:"fas fa-exclamation-circle", wa:"fas fa-exclamation-triangle", in:"fas fa-info-circle" };
+    t.querySelector("i").className = ic[type] || ic.in;
+    setTimeout(() => t.classList.remove("on"), 3500);
+  },
+
+  fillStates() {
+    const sel = document.getElementById("aSt");
+    STATES.forEach(s => { const o = document.createElement("option"); o.value = o.textContent = s; sel.appendChild(o); });
+  },
+
+  openAddrForm() {
+    document.getElementById("addrForm").reset();
+    document.getElementById("addrIdx").value = "-1";
+    document.getElementById("addrTitle").textContent = "Add Address";
+    if (UD) {
+      document.getElementById("aNm").value = ((UD.firstName||"") + " " + (UD.lastName||"")).trim();
+      if (UD.phone) document.getElementById("aPh").value = UD.phone;
+    }
+    app.router("address-form");
+  }
+};
+
+/* ── OTP DAILY COUNT in Firestore ── */
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+async function getOtpCount() {
+  try {
+    const snap = await getDoc(doc(db,"otpStats",todayKey()));
+    return snap.exists() ? (snap.data().count || 0) : 0;
+  } catch(e) { return 0; }
+}
+async function incOtpCount() {
+  try { await setDoc(doc(db,"otpStats",todayKey()), { count:increment(1), date:todayKey() }, { merge:true }); }
+  catch(e) {}
+}
+async function checkLimit() {
+  const cnt = await getOtpCount();
+  const over = cnt >= 10;
+  const wrap = document.getElementById("phWrap");
+  const ban  = document.getElementById("limBan");
+  const orD  = document.getElementById("orDiv");
+  if (over) {
+    wrap.style.cssText = "max-height:0;overflow:hidden;opacity:0;pointer-events:none;margin:0;";
+    ban.style.display = "flex";
+    orD.style.display = "none";
+  } else {
+    wrap.style.cssText = "";
+    ban.style.display = "none";
+    orD.style.display = "flex";
+  }
+  return over;
+}
+
+/* ── RECAPTCHA ── */
+function initRC() {
+  if (window._rcV) return;
+  try {
+    window._rcV = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size:"invisible", callback:()=>{}, "expired-callback":()=>resetRC()
+    });
+    window._rcV.render().then(id => { window._rcW = id; }).catch(()=>{});
+  } catch(e) {}
+}
+function resetRC() {
+  try { if (window._rcW !== undefined && window.grecaptcha) window.grecaptcha.reset(window._rcW); } catch(e) {}
+}
+
+/* ── TIMER 1:30 ── */
+function startTimer() {
+  let s = 90;
+  const el = document.getElementById("rtimer"), btn = document.getElementById("btnResend");
+  btn.disabled = true; clearInterval(resInt);
+  resInt = setInterval(() => {
+    s--;
+    const m = Math.floor(s/60), sc = s%60;
+    el.textContent = m + ":" + (sc < 10 ? "0" : "") + sc;
+    if (s <= 0) { clearInterval(resInt); btn.disabled = false; btn.textContent = "Resend OTP"; }
+  }, 1000);
+}
+
+/* ── OTP BOXES ── */
+function setupBoxes() {
+  const bxs = document.querySelectorAll(".otp-box");
+  bxs.forEach((b, i) => {
+    b.addEventListener("input", () => {
+      b.value = b.value.replace(/\D/g,"").slice(-1);
+      b.classList.toggle("filled", b.value !== "");
+      if (b.value && i < bxs.length-1) bxs[i+1].focus();
+    });
+    b.addEventListener("keydown", e => {
+      if (e.key === "Backspace" && !b.value && i > 0) {
+        bxs[i-1].value = ""; bxs[i-1].classList.remove("filled"); bxs[i-1].focus();
+      }
+    });
+    b.addEventListener("paste", e => {
+      const txt = (e.clipboardData||window.clipboardData).getData("text").replace(/\D/g,"");
+      if (txt.length === 6) { bxs.forEach((bx,ix) => { bx.value = txt[ix]||""; bx.classList.toggle("filled",!!bx.value); }); bxs[5].focus(); }
+      e.preventDefault();
+    });
+  });
+}
+
+/* ── WEB OTP API ── */
+async function tryAutoOTP() {
+  if (!("OTPCredential" in window)) return;
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 60000);
+    const cr = await navigator.credentials.get({ otp:{ transport:["sms"] }, signal:ctrl.signal });
+    if (cr?.code) {
+      const bxs = document.querySelectorAll(".otp-box");
+      [...cr.code].forEach((c,i) => { if (bxs[i]) { bxs[i].value=c; bxs[i].classList.add("filled"); } });
+      app.toast("OTP auto-filled!", "ok");
+      setTimeout(() => document.getElementById("btnVerify").click(), 500);
+    }
+  } catch(e) {}
+}
+
+/* ── SEND OTP ── */
+async function sendOtp() {
+  const over = await checkLimit();
+  if (over) { app.toast("Daily OTP limit reached. Use Google.", "wa"); return; }
+  const raw = document.getElementById("phoneInput").value.trim();
+  if (!/^\d{10}$/.test(raw)) { app.toast("Enter valid 10-digit number", "er"); return; }
+  const btn = document.getElementById("btnSendOtp");
+  btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Sending..."; btn.disabled = true;
+  resetRC();
+  try {
+    CR = await signInWithPhoneNumber(auth, "+91"+raw, window._rcV);
+    await incOtpCount();
+    document.getElementById("otpNum").textContent = "+91 "+raw;
+    document.getElementById("step-phone").style.display = "none";
+    document.getElementById("step-otp").classList.add("on");
+    document.querySelector(".otp-box").focus();
+    startTimer(); tryAutoOTP(); otpFails = 0;
+    document.getElementById("gSuggest").style.display = "none";
+  } catch(e) {
+    app.toast(e.message || "Failed to send OTP", "er");
+    btn.innerHTML = "<i class='fas fa-paper-plane'></i> Send OTP"; btn.disabled = false;
+    resetRC();
+  }
+}
+
+/* ── VERIFY OTP ── */
+async function verifyOtp() {
+  const code = [...document.querySelectorAll(".otp-box")].map(b => b.value).join("");
+  if (code.length !== 6) { app.toast("Enter full 6-digit OTP", "er"); return; }
+  const btn = document.getElementById("btnVerify");
+  btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Verifying..."; btn.disabled = true;
+  try {
+    await CR.confirm(code);
+  } catch(e) {
+    otpFails++;
+    document.querySelectorAll(".otp-box").forEach(b => { b.classList.add("err"); setTimeout(()=>b.classList.remove("err"),400); b.value=""; b.classList.remove("filled"); });
+    document.querySelector(".otp-box").focus();
+    app.toast("Wrong OTP. Try again.", "er");
+    btn.innerHTML = "<i class='fas fa-check-circle'></i> Verify & Continue"; btn.disabled = false;
+    if (otpFails >= 3) document.getElementById("gSuggest").style.display = "flex";
+  }
+}
+
+/* ── AUTH STATE ── */
+onAuthStateChanged(auth, async user => {
+  CU = user;
+  if (user) { await loadProfile(user); }
+  else { app.ld(false); fullReset(); app.router("auth"); initRC(); checkLimit(); }
+});
+
+function fullReset() {
+  document.getElementById("step-phone").style.display = "block";
+  document.getElementById("step-otp").classList.remove("on");
+  document.getElementById("phoneInput").value = "";
+  document.querySelectorAll(".otp-box").forEach(b => { b.value=""; b.classList.remove("filled"); });
+  document.getElementById("btnSendOtp").innerHTML = "<i class='fas fa-paper-plane'></i> Send OTP";
+  document.getElementById("btnSendOtp").disabled = false;
+  document.getElementById("gSuggest").style.display = "none";
+  clearInterval(resInt); CR = null; otpFails = 0;
+  try { if (window._rcV) { window._rcV.clear(); window._rcV=null; window._rcW=undefined; } } catch(e) {}
+}
+
+async function loadProfile(user) {
+  app.ld(true);
+  try {
+    const snap = await getDoc(doc(db,"users",user.uid));
+    if (snap.exists()) { UD = snap.data(); updateDash(); app.router("dashboard"); }
+    else { autoSetup(user); }
+  } catch(e) { app.toast("Error loading profile", "er"); }
+  app.ld(false);
+}
+
+/* ── AUTO SETUP — smarter for Google users ── */
+function autoSetup(user) {
+  const isPhone = user.providerData.some(p => p.providerId === "phone");
+  if (!isPhone && user.displayName) {
+    // Google user with name — hide name fields, just ask phone
+    document.getElementById("sg-fname").style.display = "none";
+    document.getElementById("sg-lname").style.display = "none";
+    document.getElementById("sg-email").style.display = "none";
+    const names = (user.displayName||"").split(" ");
+    document.getElementById("setupFName").value = names[0]||"";
+    document.getElementById("setupLName").value = names.slice(1).join(" ")||"";
+    document.getElementById("setupEmail").value = user.email||"";
+    document.getElementById("setupPhone").required = false;
+  } else {
+    document.getElementById("sg-fname").style.display = "block";
+    document.getElementById("sg-lname").style.display = "block";
+    const ph = (user.phoneNumber||"").replace("+91","");
+    if (ph) {
+      const inp = document.getElementById("setupPhone");
+      inp.value = ph; inp.readOnly = true;
+      inp.style.cssText = "background:#f3f4f6;cursor:not-allowed;opacity:.7;";
+    }
+    document.getElementById("sg-email").style.display = "block";
+  }
+  app.router("setup");
+}
+
+/* ── DASHBOARD UI ── */
+function updateDash() {
+  if (!UD) return;
+  const name = ((UD.firstName||"") + " " + (UD.lastName||"")).trim();
+  document.getElementById("dashName").textContent = name || "User";
+  const ph = UD.phone || (CU.phoneNumber||"").replace("+91","") || "";
+  document.getElementById("dashPh").textContent = ph || "Not added";
+  document.getElementById("vBadge").style.display = ph ? "inline-flex" : "none";
+  document.getElementById("phAddBan").style.display = ph ? "none" : "flex";
+  const img = document.getElementById("dashAv"), init = document.getElementById("dashIn");
+  const pic = UD.profilePicture || CU.photoURL || "";
+  if (pic) { img.src=pic; img.style.display="block"; init.style.display="none"; }
+  else { img.style.display="none"; init.style.display="flex"; init.textContent=(UD.firstName||"U").charAt(0).toUpperCase(); }
+  document.getElementById("eFN").value = UD.firstName||"";
+  document.getElementById("eLN").value = UD.lastName||"";
+  document.getElementById("eEM").value = UD.email||"";
+  document.getElementById("ePH").value = ph;
+  // Save for checkout/other pages
+  localStorage.setItem("dh_user", JSON.stringify({ name, phone:ph, uid:CU.uid }));
+  localStorage.setItem("dh_addresses", JSON.stringify(UD.addresses||[]));
+}
+
+/* ── GEOLOCATION ── */
+window.doGeo = async function() {
+  const btn = document.getElementById("geoBtn");
+  if (!navigator.geolocation) { app.toast("Location not supported","er"); return; }
+  btn.classList.add("ld"); btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Detecting...";
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude:lat, longitude:lon } = pos.coords;
+      const r = await fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lon+"&format=json");
+      const d = await r.json(); const a = d.address||{};
+      if (a.postcode) document.getElementById("aPin").value = a.postcode;
+      const city = a.city||a.town||a.village||a.county||""; if (city) document.getElementById("aCt").value = city;
+      const sr = a.state||""; const m = STATES.find(s => sr.toLowerCase().includes(s.toLowerCase())); if (m) document.getElementById("aSt").value = m;
+      const area = [a.road||"", a.suburb||a.residential||""].filter(Boolean).join(", "); if (area) document.getElementById("aTx").value = area;
+      app.toast("Location filled! Please verify.", "ok");
+    } catch(e) { app.toast("Could not fetch address. Fill manually.","in"); }
+    btn.classList.remove("ld"); btn.innerHTML = "<i class='fas fa-location-crosshairs'></i> Detect My Location";
+  }, () => {
+    app.toast("Location access denied.","in");
+    btn.classList.remove("ld"); btn.innerHTML = "<i class='fas fa-location-crosshairs'></i> Detect My Location";
+  });
+};
+
+/* ── RENDER ADDRESSES ── */
+function renderAddrs() {
+  const c = document.getElementById("addrList"), e = document.getElementById("addrEmpty");
+  c.innerHTML = ""; const list = UD.addresses||[];
+  if (!list.length) { e.style.display="block"; return; }
+  e.style.display = "none";
+  list.forEach((a,i) => {
+    const d = document.createElement("div"); d.className = "addr-card";
+    d.innerHTML = `<span class="addr-tag">Home</span>
+      <div style="font-weight:700;font-size:.94rem;margin-right:55px;">${a.name}</div>
+      <div style="color:var(--mu);font-size:.84rem;margin:3px 0;">${a.address}, ${a.city}</div>
+      <div style="color:var(--mu);font-size:.84rem;">${a.state} &ndash; ${a.pincode}</div>
+      <div style="font-weight:600;font-size:.84rem;margin-top:5px;">&#128222; ${a.phone}</div>
+      <div class="addr-act">
+        <button class="btn btn-sm btn-ok" style="flex:1" onclick="window.editAddr(${i})"><i class="fas fa-pen"></i> Edit</button>
+        <button class="btn btn-sm btn-e" style="flex:1" onclick="window.delAddr(${i})"><i class="fas fa-trash"></i> Delete</button>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ── FORMS ── */
+document.getElementById("setupForm").addEventListener("submit", async e => {
+  e.preventDefault(); app.ld(true);
+  const fName = document.getElementById("setupFName").value.trim() || (CU.displayName||"").split(" ")[0]||"";
+  const lName = document.getElementById("setupLName").value.trim() || (CU.displayName||"").split(" ").slice(1).join(" ")||"";
+  const phone = document.getElementById("setupPhone").value.trim() || (CU.phoneNumber||"").replace("+91","")||"";
+  const email = document.getElementById("setupEmail").value.trim() || CU.email||"";
+  const data = { uid:CU.uid, firstName:fName, lastName:lName, email, phone, addresses:[],
+    profilePicture:CU.photoURL||"", loginType:CU.providerData.some(p=>p.providerId==="phone")?"Phone":"Google",
+    createdAt:serverTimestamp(), updatedAt:serverTimestamp() };
+  try {
+    await setDoc(doc(db,"users",CU.uid), data);
+    if (fName) await updateProfile(CU, { displayName:fName+" "+lName });
+    UD = data; updateDash(); app.router("dashboard"); app.toast("Welcome to Discount Hub!");
+  } catch(err) { app.toast(err.message,"er"); }
+  app.ld(false);
+});
+
+document.getElementById("editForm").addEventListener("submit", async e => {
+  e.preventDefault(); app.ld(true);
+  const upd = { firstName:document.getElementById("eFN").value.trim(), lastName:document.getElementById("eLN").value.trim(), updatedAt:serverTimestamp() };
+  try {
+    await updateDoc(doc(db,"users",CU.uid), upd);
+    UD = {...UD,...upd}; updateDash(); app.router("dashboard"); app.toast("Profile updated!");
+  } catch(err) { app.toast(err.message,"er"); }
+  app.ld(false);
+});
+
+document.getElementById("addrForm").addEventListener("submit", async e => {
+  e.preventDefault(); app.ld(true);
+  const idx = parseInt(document.getElementById("addrIdx").value);
+  const na = {
+    name:document.getElementById("aNm").value.trim(),
+    phone:document.getElementById("aPh").value.trim(),
+    pincode:document.getElementById("aPin").value.trim(),
+    city:document.getElementById("aCt").value.trim(),
+    state:document.getElementById("aSt").value,
+    address:document.getElementById("aTx").value.trim(),
+    landmark:document.getElementById("aLm").value.trim(),
+    updatedAt:new Date().toISOString()
+  };
+  let list = [...(UD.addresses||[])];
+  if (idx >= 0) { list[idx]=na; } else { na.createdAt=new Date().toISOString(); list.push(na); }
+  try {
+    await updateDoc(doc(db,"users",CU.uid), { addresses:list });
+    UD.addresses = list; renderAddrs(); app.router("addresses"); app.toast("Address saved!");
+    localStorage.setItem("dh_addresses", JSON.stringify(list));
+  } catch(err) { app.toast(err.message,"er"); }
+  app.ld(false);
+});
+
+/* ── LISTENERS ── */
+app.listeners = () => {
+  document.getElementById("btnSendOtp").onclick = sendOtp;
+  document.getElementById("btnVerify").onclick  = verifyOtp;
+
+  document.getElementById("suggestG").onclick = () => {
+    document.getElementById("btnGoogle").click();
+  };
+
+  document.getElementById("btnChg").onclick = () => {
+    document.getElementById("step-otp").classList.remove("on");
+    document.getElementById("step-phone").style.display = "block";
+    document.getElementById("phoneInput").value = "";
+    document.querySelectorAll(".otp-box").forEach(b => { b.value=""; b.classList.remove("filled"); });
+    document.getElementById("btnSendOtp").innerHTML = "<i class='fas fa-paper-plane'></i> Send OTP";
+    document.getElementById("btnSendOtp").disabled = false;
+    document.getElementById("gSuggest").style.display = "none";
+    clearInterval(resInt); otpFails = 0;
+  };
+
+  document.getElementById("btnResend").onclick = async () => {
+    const raw = document.getElementById("phoneInput").value.trim(); if (!raw) return;
+    const over = await checkLimit(); if (over) { app.toast("Daily limit reached. Use Google.","wa"); return; }
+    const btn = document.getElementById("btnResend"); btn.textContent="Sending..."; btn.disabled=true;
+    resetRC();
+    try {
+      CR = await signInWithPhoneNumber(auth, "+91"+raw, window._rcV);
+      await incOtpCount();
+      document.querySelectorAll(".otp-box").forEach(b => { b.value=""; b.classList.remove("filled"); });
+      startTimer(); tryAutoOTP(); app.toast("OTP resent!");
+    } catch(e) { app.toast(e.message,"er"); btn.disabled=false; }
+  };
+
+  document.getElementById("btnGoogle").onclick = () =>
+    signInWithPopup(auth, new GoogleAuthProvider()).catch(err => app.toast(err.message,"er"));
+
+  document.getElementById("btnLogout").onclick = () => {
+    if (!confirm("Sign out?")) return;
+    signOut(auth).then(() => app.toast("Logged out"));
+  };
+
+  // Cropper
+  const upInput=document.getElementById("upInput"), ci=document.getElementById("cropImg"), mo=document.getElementById("cropMo");
+  upInput.onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = ev => { ci.src=ev.target.result; mo.classList.add("on"); if(croppr)croppr.destroy(); croppr=new Cropper(ci,{aspectRatio:1,viewMode:1}); };
+    r.readAsDataURL(f);
+  };
+  document.getElementById("saveBtn").onclick = async () => {
+    if (!croppr) return; app.ld(true);
+    const b64 = croppr.getCroppedCanvas({width:300,height:300}).toDataURL("image/jpeg",.8);
+    try { await updateDoc(doc(db,"users",CU.uid),{profilePicture:b64}); UD.profilePicture=b64; updateDash(); mo.classList.remove("on"); app.toast("Profile picture updated"); }
+    catch(err) { app.toast("Failed to save","er"); }
+    app.ld(false);
+  };
+  document.getElementById("rotBtn").onclick = () => croppr?.rotate(90);
+
+  setupBoxes();
+};
+
+/* ── GLOBAL EXPORTS ── */
+window.app = app;
+window.getDHUser = () => UD;
+window.getDHAddresses = () => UD?.addresses || [];
+
+window.editAddr = i => {
+  const a = UD.addresses[i];
+  document.getElementById("addrIdx").value = i;
+  document.getElementById("aNm").value  = a.name;
+  document.getElementById("aPh").value  = a.phone;
+  document.getElementById("aPin").value = a.pincode;
+  document.getElementById("aCt").value  = a.city;
+  document.getElementById("aSt").value  = a.state;
+  document.getElementById("aTx").value  = a.address;
+  document.getElementById("aLm").value  = a.landmark||"";
+  document.getElementById("addrTitle").textContent = "Edit Address";
+  app.router("address-form");
+};
+
+window.delAddr = async i => {
+  if (!confirm("Delete this address?")) return;
+  app.ld(true);
+  const nl = UD.addresses.filter((_,x) => x !== i);
+  try {
+    await updateDoc(doc(db,"users",CU.uid), { addresses:nl });
+    UD.addresses = nl; renderAddrs(); app.toast("Address deleted");
+    localStorage.setItem("dh_addresses", JSON.stringify(nl));
+  } catch(err) { app.toast("Error","er"); }
+  app.ld(false);
+};
+
+app.init();
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Product - Discount Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Base Styles (Consistent) --- */
+        :root {
+            --primary-color: #6c63ff; /* Main theme color */
+            --secondary-color: #4d44db;
+            --accent-color: #8dc6ff; /* Soft/Light Blue for logo */
+            --dark-color: #2d2d2d;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --success-color: #28a745; /* Green for payment button */
+            --danger-color: #dc3545;
+            --warning-color: #ffc107; /* For important notes */
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.7;
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- Button Styles --- */
+        .btn {
+            display: inline-block; padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer;
+            text-decoration: none; font-weight: 600; font-size: 16px; transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center; line-height: 1.5;
+            white-space: nowrap;
+        }
+        .btn i { margin-right: 10px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); }
+
+        .btn-success { background-color: var(--success-color); color: var(--white); }
+        .btn-success:hover { background-color: #218838; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-primary:hover { background-color: var(--secondary-color); }
+
+
+        /* --- Header Bar --- */
+        .header-bar {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .header-bar .container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            max-width: 1200px;
+        }
+        .header-logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-color); /* Soft/Light Blue */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+         .header-logo:hover {
+             color: var(--primary-color); /* Darker blue on hover */
+         }
+
+        /* --- Return Process Section --- */
+        .return-section {
+            padding-top: 100px; /* Space for fixed header */
+            padding-bottom: 60px;
+            flex-grow: 1;
+        }
+
+        .return-card {
+            background-color: var(--white);
+            padding: 30px 35px;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            animation: fadeInCard 0.6s ease-out;
+            border-top: 4px solid var(--primary-color); /* Primary color top border */
+        }
+        @keyframes fadeInCard { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .return-card h1 {
+            font-size: 24px;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+         .return-card h1 i {
+             margin-right: 10px;
+             color: var(--primary-color);
+         }
+
+        .return-policy-info {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: var(--light-gray);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 5px;
+        }
+        .return-policy-info p {
+            font-size: 15px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        .return-policy-info p:last-child { margin-bottom: 0; }
+        .return-policy-info strong { color: var(--danger-color); font-weight: 600; }
+
+        .payment-step, .form-step {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--light-gray);
+            text-align: center;
+        }
+        .payment-step h3, .form-step h3 {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .screenshot-note {
+            font-size: 15px;
+            color: var(--dark-color); /* Changed to dark color for emphasis */
+            background-color: #fff3cd; /* Light yellow for warning/info */
+            border: 1px solid #ffeeba;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            display: inline-block; /* Fit content */
+        }
+        .screenshot-note i { color: var(--warning-color); margin-right: 8px; }
+
+        /* --- Footer Styles --- */
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 18px 0; margin-top: 40px; text-align: center; font-size: 13px; }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .container { max-width: 100%; }
+        }
+        @media (max-width: 576px) {
+             .header-logo { font-size: 20px; }
+             .return-card h1 { font-size: 20px; }
+             .return-card { padding: 25px 20px; }
+             .return-policy-info p { font-size: 14px; }
+             .payment-step h3, .form-step h3 { font-size: 16px; }
+             .btn { width: 100%; padding: 12px 20px; font-size: 15px;}
+             .screenshot-note { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header-bar">
+        <div class="container">
+            <a href="index.html" class="header-logo">Discount Hub</a>
+        </div>
+    </header>
+
+    <!-- Return Process Section -->
+    <main class="return-section">
+        <div class="container">
+            <div class="return-card">
+                <h1><i class="fas fa-undo-alt"></i> Product Return Process</h1>
+
+                <div class="return-policy-info">
+                    <p>We carefully check and verify every product before shipping. We only accept returns for <strong>wrong or defective products</strong>.</p>
+                    <p>You must pay a return processing fee of <strong>₹99</strong>. This fee is either deducted from your refund or paid in advance.</p>
+                    <p>If you agree to these terms, you can proceed to return your product.</p>
+                </div>
+
+                <!-- Step 1: Payment -->
+                <div class="payment-step">
+                    <h3>Step 1: Pay Return Fee</h3>
+                    <p>Click the button below to pay the ₹99 return processing fee via UPI.</p>
+                    <a href="upi://pay?pa=aditya-295@axl&pn=Aditya&am=99&cu=INR" class="btn btn-success" id="pay-return-fee-btn">
+                        <i class="fas fa-rupee-sign"></i> Pay ₹99 Now
+                    </a>
+                    <p class="screenshot-note">
+                       <i class="fas fa-exclamation-triangle"></i> <strong>Important: After completing the ₹99 payment, please take a screenshot of the payment as proof. This screenshot will be required in the next step.</strong>
+                    </p>
+                </div>
+
+                <!-- Step 2: Google Form -->
+                <div class="form-step">
+                    <h3>Step 2: Submit Return Request</h3>
+                    <p>Once payment is complete and you have the screenshot, please fill out our return request form.</p>
+                     <p style="margin-bottom: 20px;">You will need to upload your payment screenshot in the form.</p>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSejLsUG-VSavjpuuNk2V5hG76rv21lfSMo1BJhwa1hG-j1NUg/viewform?usp=header" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="go-to-return-form-btn">
+                        <i class="fas fa-file-alt"></i> Go to Return Form
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2024 Discount Hub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        console.log("Return page loaded.");
+        // No complex JS needed for this page as actions are direct links.
+        // You could add a flag on "Pay ₹99 Now" click if you want to track that event
+        // before the user potentially navigates to the Google Form or if the UPI app fails.
+        const payButton = document.getElementById('pay-return-fee-btn');
+        if (payButton) {
+            payButton.addEventListener('click', () => {
+                localStorage.setItem('returnPaymentAttempted', 'true'); // Simple flag
+                // Note: The UPI link itself will handle the redirection.
+            });
+        }
+    </script>
+</body>
+</html

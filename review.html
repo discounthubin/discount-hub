@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Write a Review | Discount Hub</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #6c63ff;
+            --accent-glow: #00e5ff;
+            --dark-bg: #0b0b0f;
+            --surface-color: #1a1a20;
+            --input-bg: #25252e;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --warning: #ffc107;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--dark-bg); 
+            color: var(--text-main); 
+            line-height: 1.5; 
+            padding-bottom: 80px;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Header --- */
+        .page-header {
+            padding: 20px 0;
+            display: flex; align-items: center; gap: 15px;
+            position: sticky; top: 0; background: rgba(11, 11, 15, 0.95);
+            backdrop-filter: blur(10px); z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .back-btn { font-size: 1.4rem; color: var(--text-main); background: none; border: none; padding: 5px; }
+        .page-title { font-size: 1.1rem; font-weight: 600; }
+
+        /* --- Form Elements --- */
+        .review-section { margin-bottom: 25px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .label { display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 500; color: var(--text-muted); }
+        .label span { color: var(--primary-color); font-size: 0.8rem; }
+        
+        /* Star Rating */
+        .star-wrapper {
+            background: var(--surface-color); padding: 20px; border-radius: var(--radius);
+            display: flex; justify-content: center; gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .star-wrapper i { font-size: 2.2rem; color: #333; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .star-wrapper i.active { color: var(--warning); transform: scale(1.1); }
+
+        /* Text Input */
+        .input-box { 
+            width: 100%; padding: 15px; background: var(--surface-color); 
+            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); 
+            color: white; font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .input-box:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2); }
+        textarea.input-box { height: 140px; resize: none; }
+
+        /* Media Upload Grid */
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; }
+        .media-item { 
+            position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.1); background: #000;
+        }
+        .media-item img, .media-item video { width: 100%; height: 100%; object-fit: cover; }
+        .remove-media {
+            position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); 
+            color: white; border-radius: 50%; width: 20px; height: 20px; 
+            display: flex; align-items: center; justify-content: center; font-size: 10px;
+        }
+
+        /* Camera UI */
+        .camera-trigger {
+            background: rgba(108, 99, 255, 0.1); border: 2px dashed var(--primary-color);
+            border-radius: var(--radius); padding: 20px; text-align: center;
+            cursor: pointer; transition: 0.2s; color: var(--primary-color);
+        }
+        .camera-trigger:active { background: rgba(108, 99, 255, 0.2); transform: scale(0.98); }
+        .camera-trigger i { font-size: 1.8rem; margin-bottom: 8px; }
+        
+        .recorder-container {
+            display: none; position: relative; background: #000; border-radius: var(--radius);
+            overflow: hidden; margin-top: 10px; aspect-ratio: 3/4;
+        }
+        .recorder-container video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .recorder-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+        }
+        
+        .record-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: 4px solid white;
+            background: var(--danger); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .record-btn.recording { transform: scale(1.1); border-color: var(--danger); background: white; animation: pulse 1s infinite; }
+        .record-btn i { font-size: 1.2rem; color: white; }
+        .record-btn.recording i { color: var(--danger); }
+        
+        .timer-badge {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.8); color: white; padding: 4px 12px;
+            border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: none;
+        }
+
+        /* Submit Button */
+        .submit-area { position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; background: var(--surface-color); border-top: 1px solid rgba(255,255,255,0.05); z-index: 90; }
+        .btn { 
+            width: 100%; padding: 16px; border-radius: 50px; font-weight: 600; 
+            font-size: 1rem; border: none; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: 0.3s; max-width: 500px; margin: 0 auto;
+        }
+        .btn-primary { background: var(--primary-color); color: white; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3); }
+        .btn-primary:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
+        
+        /* Loading & Success */
+        .loading-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(11, 11, 15, 0.9); z-index: 2000; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 0.8s infinite linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
+
+        /* Existing Review Card */
+        .success-card {
+            background: var(--surface-color); padding: 40px 20px; border-radius: var(--radius);
+            text-align: center; border: 1px solid var(--success); margin-top: 20px;
+        }
+        .success-icon { font-size: 4rem; color: var(--success); margin-bottom: 20px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        .action-btns { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 12px; font-size: 0.9rem; }
+        .btn-danger-outline { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 12px; font-size: 0.9rem; }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #333; color: white; padding: 12px 24px; border-radius: 50px; transition: 0.4s; z-index: 3000; box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-size: 0.9rem; display: flex; align-items: center; gap: 10px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); color: #000; font-weight: 500; }
+        .toast.error { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader" class="loading-overlay">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; color:#fff; font-size:0.9rem;">Verifying Purchase...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="page-header container">
+        <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="page-title">Rate Product</span>
+    </header>
+
+    <div class="container" style="padding-bottom: 20px;">
+        
+        <!-- Review Form -->
+        <form id="review-form" style="display:none;">
+            
+            <!-- 1. Star Rating -->
+            <div class="review-section">
+                <label class="label">How was the product? <span>*Required</span></label>
+                <div class="star-wrapper" id="star-container">
+                    <i class="far fa-star" data-val="1"></i>
+                    <i class="far fa-star" data-val="2"></i>
+                    <i class="far fa-star" data-val="3"></i>
+                    <i class="far fa-star" data-val="4"></i>
+                    <i class="far fa-star" data-val="5"></i>
+                </div>
+                <input type="hidden" id="rating-input" required>
+            </div>
+
+            <!-- 2. Comment -->
+            <div class="review-section">
+                <label class="label">Write your review <span>*Required</span></label>
+                <textarea id="review-text" class="input-box" placeholder="What did you like or dislike? How is the quality?" required></textarea>
+            </div>
+
+            <!-- 3. Photos -->
+            <div class="review-section">
+                <label class="label">Add Photos (Max 3)</label>
+                <input type="file" id="image-upload" accept="image/*" multiple style="display:none">
+                <div class="camera-trigger" onclick="document.getElementById('image-upload').click()" style="padding: 15px;">
+                    <i class="fas fa-images"></i>
+                    <div style="font-size:0.85rem;">Tap to select images</div>
+                </div>
+                <div class="media-grid" id="image-previews"></div>
+            </div>
+
+            <!-- 4. Video Recording -->
+            <div class="review-section">
+                <label class="label">Record Video Review (Max 10MB)</label>
+                
+                <!-- Initial Trigger -->
+                <div id="video-start-ui" class="camera-trigger" onclick="startCamera()">
+                    <i class="fas fa-video"></i>
+                    <div style="font-size:0.85rem;">Tap to Record Video</div>
+                </div>
+
+                <!-- Recorder UI -->
+                <div id="recorder-ui" class="recorder-container">
+                    <video id="live-preview" autoplay playsinline muted></video>
+                    <div class="timer-badge" id="rec-timer">00:00</div>
+                    <div class="recorder-overlay">
+                        <button type="button" class="back-btn" onclick="stopCamera()" style="background:rgba(0,0,0,0.5); border-radius:50%; width:40px; height:40px;"><i class="fas fa-times"></i></button>
+                        <div class="record-btn" id="record-toggle-btn" onclick="toggleRecording()">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playback UI -->
+                <div id="video-playback-ui" class="recorder-container">
+                    <video id="recorded-video" controls playsinline></video>
+                    <div class="recorder-overlay" style="padding:10px;">
+                        <button type="button" class="btn btn-danger-outline" onclick="retakeVideo()" style="flex:1; background:rgba(0,0,0,0.8); border:none; color:white;">Retake</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 60px;"></div> <!-- Spacer -->
+            
+            <div class="submit-area">
+                <div class="container">
+                    <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+                        Submit Review
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Existing Review State -->
+        <div id="existing-review-ui" class="success-card" style="display:none;">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2 style="font-size:1.5rem; margin-bottom:10px;">Review Submitted</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Thank you for your feedback!</p>
+            
+            <div id="edit-actions" class="action-btns" style="display:none;">
+                <button class="btn btn-outline" onclick="enableEditMode()" style="flex:1;">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+                <button class="btn btn-danger-outline" onclick="deleteReview()" style="flex:1;">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+            <p id="locked-msg" style="display:none; margin-top:20px; color:var(--text-muted); font-size:0.8rem; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                <i class="fas fa-lock"></i> Editing is locked after 24 hours.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"><i class="fas fa-info-circle"></i> <span>Message</span></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { 
+        getFirestore, collection, query, where, getDocs, doc, setDoc, deleteDoc, serverTimestamp, getDoc 
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { 
+        getStorage, ref, uploadBytes, getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+        authDomain: "discounthubadmin.firebaseapp.com",
+        projectId: "discounthubadmin",
+        storageBucket: "discounthubadmin.firebasestorage.app",
+        messagingSenderId: "610110627519",
+        appId: "1:610110627519:web:0593a19ddc34fb669ef00a",
+        measurementId: "G-NQECVWHTDJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // --- Variables ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const productSlug = urlParams.get('slug');
+    let currentUser = null;
+    let existingReviewId = null;
+    let selectedImages = [];
+    
+    // Recorder Variables
+    let mediaRecorder;
+    let recordedChunks = [];
+    let videoBlob = null;
+    let stream = null;
+    let recordTimerInterval;
+    let recordSeconds = 0;
+
+    // --- DOM ---
+    const loader = document.getElementById('loader');
+    const form = document.getElementById('review-form');
+    const existingUI = document.getElementById('existing-review-ui');
+    const submitBtn = document.getElementById('submit-btn');
+    const stars = document.querySelectorAll('#star-container i');
+    const ratingInput = document.getElementById('rating-input');
+    const reviewText = document.getElementById('review-text');
+
+    // --- Initialization ---
+    async function init() {
+        if (!productSlug) {
+            showToast("Invalid Product Link", "error");
+            setTimeout(() => window.location.href = "index.html", 2000);
+            return;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await checkExistingReview();
+            } else {
+                localStorage.setItem('redirect_after_login', window.location.href);
+                window.location.href = "settings.html"; // Redirect to login
+            }
+        });
+    }
+
+    // --- Logic: Check Review ---
+    async function checkExistingReview() {
+        try {
+            // Check based on User ID + Slug to prevent duplicates
+            const docId = `${currentUser.uid}_${productSlug}`;
+            const docRef = doc(db, "reviews", docId);
+            const docSnap = await getDoc(docRef);
+
+            loader.style.display = 'none';
+
+            if (docSnap.exists()) {
+                existingReviewId = docSnap.id;
+                showExistingUI(docSnap.data());
+            } else {
+                form.style.display = 'block';
+                validateForm();
+            }
+        } catch (error) {
+            console.error(error);
+            showToast("Error loading data", "error");
+            loader.style.display = 'none';
+        }
+    }
+
+    function showExistingUI(data) {
+        form.style.display = 'none';
+        existingUI.style.display = 'block';
+
+        const createdAt = data.createdAt ? data.createdAt.toMillis() : Date.now();
+        const diffHours = (Date.now() - createdAt) / (1000 * 60 * 60);
+
+        if (diffHours < 24) {
+            document.getElementById('edit-actions').style.display = 'flex';
+        } else {
+            document.getElementById('locked-msg').style.display = 'block';
+        }
+    }
+
+    // --- UI Interactions ---
+
+    // 1. Stars
+    document.getElementById('star-container').addEventListener('click', (e) => {
+        if (e.target.tagName === 'I') {
+            const val = e.target.dataset.val;
+            ratingInput.value = val;
+            stars.forEach(s => {
+                s.className = s.dataset.val <= val ? "fas fa-star active" : "far fa-star";
+            });
+            validateForm();
+        }
+    });
+
+    // 2. Text Validation
+    reviewText.addEventListener('input', validateForm);
+
+    function validateForm() {
+        const isValid = ratingInput.value && reviewText.value.trim().length > 3;
+        submitBtn.disabled = !isValid;
+    }
+
+    // 3. Image Upload
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length + selectedImages.length > 3) {
+            showToast("Max 3 images allowed", "error");
+            return;
+        }
+
+        const container = document.getElementById('image-previews');
+        
+        files.forEach(file => {
+            if (file.size > 5 * 1024 * 1024) return; // Skip big files
+            selectedImages.push(file);
+            
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const div = document.createElement('div');
+                div.className = 'media-item';
+                div.innerHTML = `<img src="${ev.target.result}"><div class="remove-media" onclick="removeImage(${selectedImages.length-1})"><i class="fas fa-times"></i></div>`;
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    window.removeImage = (index) => {
+        // Simplified removal for UI demo (In prod, rebuild array)
+        showToast("Image removed (re-select to reset)", "success");
+        selectedImages = [];
+        document.getElementById('image-previews').innerHTML = '';
+    };
+
+    // 4. Video Recording Logic
+    window.startCamera = async () => {
+        try {
+            document.getElementById('video-start-ui').style.display = 'none';
+            document.getElementById('recorder-ui').style.display = 'block';
+            
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" }, 
+                audio: true 
+            });
+            
+            const preview = document.getElementById('live-preview');
+            preview.srcObject = stream;
+        } catch (err) {
+            console.error(err);
+            showToast("Camera permission denied", "error");
+            stopCamera();
+        }
+    };
+
+    window.stopCamera = () => {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        document.getElementById('recorder-ui').style.display = 'none';
+        document.getElementById('video-start-ui').style.display = 'block';
+        clearInterval(recordTimerInterval);
+    };
+
+    window.toggleRecording = () => {
+        const btn = document.getElementById('record-toggle-btn');
+        const icon = btn.querySelector('i');
+        const timerBadge = document.getElementById('rec-timer');
+
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            // Stop
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            icon.className = 'fas fa-circle';
+            timerBadge.style.display = 'none';
+            clearInterval(recordTimerInterval);
+        } else {
+            // Start
+            recordedChunks = [];
+            try {
+                // Try to use constrained bitrate for size control
+                const options = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 1000000 }; // ~1Mbps
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                     mediaRecorder = new MediaRecorder(stream); // Fallback
+                } else {
+                     mediaRecorder = new MediaRecorder(stream, options);
+                }
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(stream);
+            }
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                if (blob.size > 10 * 1024 * 1024) {
+                    showToast("Video too large (>10MB). Please retry.", "error");
+                    recordedChunks = [];
+                    return;
+                }
+                videoBlob = blob;
+                showPlayback();
+            };
+
+            mediaRecorder.start();
+            btn.classList.add('recording');
+            icon.className = 'fas fa-square';
+            timerBadge.style.display = 'block';
+            
+            // Auto-stop logic (60 seconds max to stay safe under 10MB)
+            recordSeconds = 0;
+            recordTimerInterval = setInterval(() => {
+                recordSeconds++;
+                const mins = Math.floor(recordSeconds / 60).toString().padStart(2, '0');
+                const secs = (recordSeconds % 60).toString().padStart(2, '0');
+                timerBadge.textContent = `${mins}:${secs}`;
+                
+                if (recordSeconds >= 60) {
+                    toggleRecording(); // Auto stop
+                    showToast("Max duration reached", "info");
+                }
+            }, 1000);
+        }
+    };
+
+    function showPlayback() {
+        stopCamera(); // Stop stream to save battery
+        document.getElementById('video-start-ui').style.display = 'none';
+        document.getElementById('video-playback-ui').style.display = 'block';
+        
+        const video = document.getElementById('recorded-video');
+        video.src = URL.createObjectURL(videoBlob);
+    }
+
+    window.retakeVideo = () => {
+        videoBlob = null;
+        recordedChunks = [];
+        document.getElementById('video-playback-ui').style.display = 'none';
+        startCamera();
+    };
+
+
+    // --- Form Submission ---
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="spinner"></div>';
+        loader.innerHTML = '<div class="spinner"></div><p style="margin-top:15px; color:#fff">Uploading Review...</p>';
+        loader.style.display = 'flex';
+
+        try {
+            // 1. Upload Images
+            const imageUrls = [];
+            for (let i = 0; i < selectedImages.length; i++) {
+                const file = selectedImages[i];
+                const path = `reviews/images/${currentUser.uid}_${Date.now()}_${i}`;
+                const storageRef = ref(storage, path);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+                imageUrls.push(url);
+            }
+
+            // 2. Upload Video (If Recorded)
+            let videoUrl = null;
+            if (videoBlob) {
+                const path = `reviews/videos/${currentUser.uid}_${Date.now()}.webm`;
+                const storageRef = ref(storage, path);
+                await uploadBytes(storageRef, videoBlob);
+                videoUrl = await getDownloadURL(storageRef);
+            }
+
+            // 3. Save to Firestore
+            const docId = `${currentUser.uid}_${productSlug}`;
+            const reviewData = {
+                productSlug: productSlug,
+                userId: currentUser.uid,
+                userName: currentUser.displayName || "Verified Customer",
+                userPhoto: currentUser.photoURL || null,
+                rating: parseInt(ratingInput.value),
+                comment: reviewText.value,
+                images: imageUrls,
+                videoUrl: videoUrl,
+                orderId: "verified_purchase", // Placeholder or fetch from orders
+                createdAt: serverTimestamp(),
+                editable: true
+            };
+
+            await setDoc(doc(db, "reviews", docId), reviewData);
+
+            loader.style.display = 'none';
+            showToast("Review Submitted!", "success");
+            setTimeout(() => window.location.reload(), 1500);
+
+        } catch (error) {
+            console.error(error);
+            showToast("Upload failed. Try again.", "error");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Review';
+            loader.style.display = 'none';
+        }
+    });
+
+    // --- Actions ---
+    window.enableEditMode = async () => {
+        if(!confirm("Editing requires re-submitting. Current review will be deleted. Continue?")) return;
+        
+        loader.innerHTML = '<p style="color:white">Preparing...</p>';
+        loader.style.display = 'flex';
+        
+        await deleteReviewLogic();
+        window.location.reload(); 
+    };
+
+    window.deleteReview = async () => {
+        if(!confirm("Permanently delete this review?")) return;
+        await deleteReviewLogic();
+        window.history.back();
+    };
+
+    async function deleteReviewLogic() {
+        if(!existingReviewId) return;
+        const docRef = doc(db, "reviews", existingReviewId);
+        await deleteDoc(docRef);
+    }
+
+    // --- Helpers ---
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.innerHTML = type === 'success' ? `<i class="fas fa-check"></i> ${msg}` : `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+        t.className = `toast show ${type}`;
+        setTimeout(() => t.className = 'toast', 3000);
+    }
+
+    // Start
+    init();
+
+</script>
+</body>
+</html>

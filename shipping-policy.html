@@ -1,0 +1,173 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipping Policy - Discount Hub</title>
+    <link rel="icon" href="dh.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Base Styles (Consistent) --- */
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4d44db;
+            --accent-color: #ff6584;
+            --dark-color: #2d2d2d;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.7;
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- Navbar Styles (Minimal) --- */
+        .navbar { background-color: var(--white); box-shadow: var(--box-shadow); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; height: 60px; max-width: 1200px; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-color); text-decoration: none; white-space: nowrap; }
+        .nav-links { display: none; align-items: center; gap: 10px;} /* Placeholder, actual links are on index */
+        .nav-links a { text-decoration: none; color: var(--dark-color); font-weight: 500; font-size: 14px; padding: 5px 8px; border-radius: 5px;}
+        .nav-links a:hover { color: var(--primary-color); background-color: var(--light-gray); }
+        .mobile-menu-btn, .cart-icon, .search-bar { display: none; } /* Hidden on this page */
+
+        /* --- Content Section --- */
+        .content-section {
+            padding-top: 100px; /* Space for fixed navbar */
+            padding-bottom: 60px;
+            flex-grow: 1;
+        }
+
+        .content-section h1 {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .content-card {
+            background-color: var(--white);
+            padding: 30px 35px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .content-block {
+            margin-bottom: 25px;
+        }
+        .content-block:last-child { margin-bottom: 0; }
+
+        .content-block h3 {
+            font-size: 20px;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .content-block p {
+            font-size: 16px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+         .content-block p:last-child { margin-bottom: 0; }
+
+        /* --- Footer Styles --- */
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 18px 0; margin-top: 40px; text-align: center; font-size: 13px; }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .content-section h1 { font-size: 28px; }
+            .content-block h3 { font-size: 18px; }
+            .content-block p { font-size: 15px; }
+        }
+        @media (max-width: 576px) {
+             .content-section h1 { font-size: 24px; margin-bottom: 15px;}
+             .content-card { padding: 25px 20px; }
+             .content-block h3 { font-size: 16px; margin-bottom: 8px; }
+             .content-block p { font-size: 14px; margin-bottom: 8px;}
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Discount Hub</a>
+             <!-- Minimal Navbar -->
+            <div class="nav-links">
+                 <a href="index.html">Home</a>
+                 <a href="contact.html">Contact</a>
+                 <a href="about.html">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Shipping Policy Section -->
+    <main class="content-section">
+        <div class="container">
+            <h1>Shipping Policy</h1>
+
+            <div class="content-card">
+                <div class="content-block">
+                    <h3>Order Processing</h3>
+                    <p>Orders are typically processed within 1-2 business days (excluding weekends and holidays) after receiving your order confirmation email. You will receive another notification when your order has shipped.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Shipping Rates and Estimates</h3>
+                    <p>We offer FREE shipping on all orders within India.</p>
+                    <p>Estimated delivery times are calculated from the date of shipping, not the date of order placement.</p>
+                    <p>Estimated delivery within India: 7-10 business days, depending on location.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Shipping Partners</h3>
+                    <p>We partner with reputable courier companies <strong>[delihvery , amazon shipping , ecom express]</strong>) to deliver your orders safely and quickly.</p>
+                </div>
+
+                 <div class="content-block">
+                    <h3>Tracking Your Order</h3>
+                    <p>When your order has shipped, you will receive an email notification from us which will include a tracking number you can use to check its status. Please allow up to 48 hours for the tracking information to become available.</p>
+                     <p>You can also track your order using the "Track Order" link in the website's main navigation or your order history if you have placed an order.</p>
+                 </div>
+
+                <div class="content-block">
+                    <h3>Local Delivery/Restrictions</h3>
+                    <p>We currently ship to most locations across India. However, there might be some remote areas where delivery is not possible. We will inform you if your address falls under such a category after you place your order.</p>
+                </div>
+
+                 <div class="content-block">
+                    <h3>Damaged or Lost Orders</h3>
+                    <p>If your order arrives damaged in any way, please email us as soon as possible at [Your Support Email] <strong>[discounthubofficial1@gmail.com]</strong> with your order number and a photo of the item's condition. We address these on a case-by-case basis but will try our best to work towards a satisfactory solution.</p>
+                    <p>If you haven’t received your order within 12 days of receiving your shipping confirmation email, please contact us at [discounthubofficial1@gmail.com] <strong>[discounthubofficial1@gmail.com]</strong> with your name and order number, and we will look into it for you.</p>
+                 </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2024 Discount Hub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html

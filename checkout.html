@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Secure Checkout - Discount Hub</title>
+<link rel="icon" href="dh.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --pr:#5c4ee8; --prd:#3d31c4; --prl:#eceaff; --prl2:#f7f6ff;
+  --ok:#00b96b; --okd:#008f52; --okl:#e6f9f1;
+  --er:#f03e3e; --wa:#f59f00; --wal:#fff9e6;
+  --bg:#f5f5f7; --sf:#fff; --tx:#111827; --tx2:#374151; --mu:#6b7280; --bd:#e5e7eb; --bd2:#f3f4f6;
+  --rs:14px; --rm:20px; --rl:24px;
+  --s1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --s2:0 4px 16px rgba(0,0,0,.08);
+  --s3:0 12px 40px rgba(0,0,0,.12);
+  --fh:"Syne",sans-serif; --fb:"Plus Jakarta Sans",sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--bg);color:var(--tx);overflow-x:hidden;min-height:100vh;padding-bottom:100px;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;border:none;font-family:inherit;background:none;}
+input,select,textarea{font-family:inherit;}
+
+/* LOADER */
+#pgLoad{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s,visibility .5s;}
+#pgLoad.out{opacity:0;visibility:hidden;pointer-events:none;}
+.ld-bag{position:relative;width:68px;height:78px;animation:bagFloat 2.2s ease-in-out infinite;}
+.ld-bag::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:24px;border:4px solid #111827;border-bottom:none;border-radius:16px 16px 0 0;z-index:1;}
+.ld-body{position:absolute;bottom:0;left:0;width:100%;height:62px;background:linear-gradient(135deg,var(--pr),#8b7cf6);border-radius:12px;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 10px 28px rgba(92,78,232,.35);}
+.ld-svg{width:40px;height:40px;fill:none;}
+.ld-t{stroke:rgba(255,255,255,.18);stroke-width:5;stroke-linecap:round;}
+.ld-p{stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-dasharray:105;stroke-dashoffset:105;animation:dDraw 1.6s ease-in-out infinite;}
+@keyframes bagFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes dDraw{0%{stroke-dashoffset:105;}50%{stroke-dashoffset:0;}100%{stroke-dashoffset:-105;}}
+
+/* NAVBAR */
+.navbar{background:rgba(255,255,255,.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.06);position:sticky;top:0;z-index:600;height:56px;}
+.nav-inner{max-width:600px;margin:0 auto;padding:0 16px;height:100%;display:flex;align-items:center;gap:12px;}
+.nav-back{width:36px;height:36px;border-radius:10px;background:var(--bd2);display:flex;align-items:center;justify-content:center;color:var(--tx);font-size:.85rem;transition:.2s;flex-shrink:0;}
+.nav-back:hover{background:var(--prl);color:var(--pr);}
+.nav-title{font-family:var(--fh);font-size:1.05rem;font-weight:700;color:var(--tx);flex:1;}
+.nav-secure{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;color:var(--ok);background:var(--okl);padding:4px 10px;border-radius:20px;}
+.nav-user-chip{display:none;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--mu);background:var(--bd2);padding:5px 11px;border-radius:20px;}
+.nav-user-chip i{color:var(--pr);}
+.nav-user-chip.show{display:flex;}
+
+/* WRAP */
+.wrap{max-width:600px;margin:0 auto;padding:14px 14px 0;}
+
+/* CARD */
+.card{background:var(--sf);border-radius:var(--rm);box-shadow:var(--s1);border:1px solid rgba(0,0,0,.04);margin-bottom:12px;overflow:hidden;}
+.card-body{padding:18px;}
+.card-title{font-family:var(--fh);font-size:.9rem;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.card-title i{color:var(--pr);font-size:.85rem;}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;padding:16px 20px;gap:0;background:var(--sf);border-bottom:1px solid var(--bd);}
+.s-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none;}
+.s-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;border:2px solid var(--bd);color:var(--mu);background:#fff;transition:all .3s;}
+.s-dot.act{background:var(--pr);border-color:var(--pr);color:#fff;box-shadow:0 0 0 4px var(--prl);}
+.s-dot.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+.s-lbl{font-size:.62rem;font-weight:700;color:var(--mu);white-space:nowrap;letter-spacing:.02em;}
+.s-dot.act+.s-lbl,.s-dot.act ~ .s-lbl{color:var(--pr);}
+.s-line{flex:1;height:2px;background:var(--bd);margin:0 4px;margin-bottom:14px;border-radius:2px;transition:background .3s;}
+.s-line.done{background:var(--ok);}
+
+/* STEP VIEWS */
+.step-vw{display:none;animation:sIn .32s cubic-bezier(.22,1,.36,1);}
+.step-vw.on{display:block;}
+@keyframes sIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ━━━ AUTH PANEL ━━━ */
+.auth-wrap{padding:14px 0;}
+.auth-card{background:var(--sf);border-radius:var(--rl);overflow:hidden;box-shadow:var(--s2);}
+.auth-top{background:linear-gradient(140deg,#5c4ee8 0%,#7c6cf8 50%,#a78bfa 100%);padding:32px 22px 28px;text-align:center;position:relative;overflow:hidden;}
+.auth-top::after{content:"";position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:120px;height:60px;background:rgba(255,255,255,.08);border-radius:50%;filter:blur(20px);}
+.auth-top-icon{width:58px;height:58px;background:rgba(255,255,255,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;backdrop-filter:blur(8px);}
+.auth-top-icon i{font-size:1.6rem;color:#fff;}
+.auth-top h2{font-family:var(--fh);font-size:1.45rem;font-weight:800;color:#fff;margin-bottom:5px;}
+.auth-top p{color:rgba(255,255,255,.78);font-size:.82rem;line-height:1.5;}
+.auth-features{display:flex;justify-content:center;gap:16px;margin-top:16px;flex-wrap:wrap;}
+.auth-feat-chip{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:rgba(255,255,255,.85);background:rgba(255,255,255,.14);padding:4px 10px;border-radius:20px;backdrop-filter:blur(4px);}
+.auth-bottom{padding:22px;}
+.lim-ban{background:var(--wal);border:1.5px solid var(--wa);border-radius:var(--rs);padding:10px 13px;margin-bottom:14px;display:flex;align-items:center;gap:9px;font-size:.8rem;color:#92400e;font-weight:600;}
+.lim-ban i{color:var(--wa);flex-shrink:0;}
+
+/* Phone input */
+.ph-row{display:flex;align-items:center;border:1.5px solid var(--bd);border-radius:var(--rs);background:#f9fafb;overflow:hidden;transition:.2s;height:52px;}
+.ph-row:focus-within{border-color:var(--pr);background:#fff;box-shadow:0 0 0 3px var(--prl);}
+.ph-flag{padding:0 12px;display:flex;align-items:center;gap:5px;border-right:1.5px solid var(--bd);height:100%;font-weight:700;font-size:.87rem;color:var(--tx);flex-shrink:0;white-space:nowrap;}
+.ph-input{flex:1;border:none;background:transparent;padding:0 12px;font-size:1rem;font-family:var(--fb);font-weight:700;color:var(--tx);outline:none;letter-spacing:.5px;height:100%;}
+.ph-input::placeholder{color:#c4c9d0;font-weight:400;letter-spacing:0;}
+
+/* OTP boxes */
+.otp-section{display:none;}
+.otp-section.on{display:block;animation:sIn .28s ease;}
+.otp-meta{font-size:.84rem;color:var(--mu);text-align:center;margin-bottom:16px;line-height:1.5;}
+.otp-meta strong{color:var(--tx);font-weight:700;}
+.otp-row{display:flex;gap:8px;justify-content:center;margin-bottom:18px;}
+.otp-b{width:46px;height:56px;border:2px solid var(--bd);border-radius:12px;text-align:center;font-size:1.5rem;font-weight:800;font-family:var(--fh);color:var(--tx);background:#f9fafb;outline:none;transition:.2s;caret-color:var(--pr);}
+.otp-b:focus{border-color:var(--pr);background:#fff;box-shadow:0 0 0 3px var(--prl);}
+.otp-b.filled{border-color:var(--pr);background:var(--prl2);}
+.otp-b.err{border-color:var(--er);background:#fff5f5;animation:errShake .35s ease;}
+@keyframes errShake{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}60%{transform:translateX(5px);}}
+.otp-meta2{text-align:center;font-size:.8rem;color:var(--mu);margin-top:10px;}
+.re-btn{color:var(--pr);font-weight:700;font-size:.8rem;background:none;border:none;cursor:pointer;font-family:var(--fb);}
+.re-btn:disabled{color:var(--mu);cursor:default;}
+.g-sug{background:var(--prl2);border:1.5px solid rgba(92,78,232,.18);border-radius:var(--rs);padding:11px 13px;margin-top:12px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--mu);}
+.g-sug i{color:var(--pr);flex-shrink:0;}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--mu);font-size:.75rem;font-weight:700;letter-spacing:.06em;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--bd);}
+
+/* ━━━ BUTTONS ━━━ */
+.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px 20px;border-radius:var(--rm);font-weight:700;font-size:.92rem;transition:all .2s;gap:9px;font-family:var(--fb);cursor:pointer;border:none;outline:none;line-height:1;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--pr),var(--prd));color:#fff;box-shadow:0 4px 16px rgba(92,78,232,.3);}
+.btn-primary:hover{box-shadow:0 6px 22px rgba(92,78,232,.4);}
+.btn-primary:disabled{background:#c4c9d4;box-shadow:none;cursor:not-allowed;}
+.btn-google{background:#fff;border:1.5px solid var(--bd);color:var(--tx);font-weight:600;box-shadow:var(--s1);}
+.btn-secondary{background:#fff;border:1.5px solid var(--bd);color:var(--tx2);}
+.btn-success{background:linear-gradient(135deg,var(--ok),var(--okd));color:#fff;box-shadow:0 4px 14px rgba(0,185,107,.28);}
+.btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.28);}
+.btn-sm{padding:9px 16px;font-size:.82rem;width:auto;border-radius:10px;}
+.btn-ghost{background:transparent;border:1.5px solid var(--bd);color:var(--tx2);font-size:.82rem;padding:8px 14px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;font-weight:600;width:auto;}
+
+/* ━━━ STICKY BOTTOM BAR ━━━ */
+.bottom-bar{position:fixed;bottom:0;left:0;width:100%;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:400;box-shadow:0 -4px 20px rgba(0,0,0,.07);}
+.bottom-bar-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.bottom-bar-price{flex:1;}
+.bottom-bar-price .label{font-size:.72rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.bottom-bar-price .amount{font-family:var(--fh);font-size:1.2rem;font-weight:800;color:var(--tx);}
+.bottom-bar-price .amount span{font-size:.75rem;color:var(--mu);font-weight:500;text-decoration:line-through;margin-left:4px;}
+.bottom-bar-btn{flex:none;min-width:160px;padding:14px 22px;font-size:.9rem;}
+
+/* ━━━ FORMS ━━━ */
+.fg{position:relative;margin-bottom:14px;}
+.fi{width:100%;padding:14px 14px 8px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#f9fafb;font-size:.93rem;font-family:var(--fb);transition:all .2s;outline:none;color:var(--tx);}
+.fi:focus{border-color:var(--pr);background:#fff;box-shadow:0 0 0 3px var(--prl);}
+.fi::placeholder{color:transparent;}
+.fl{position:absolute;left:13px;top:13px;color:var(--mu);font-size:.88rem;pointer-events:none;transition:.2s;font-weight:500;}
+.fi:focus ~ .fl, .fi:not(:placeholder-shown) ~ .fl{top:-7px;left:9px;font-size:.68rem;color:var(--pr);font-weight:700;background:#fff;padding:0 5px;border-radius:3px;}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;}
+textarea.fi{resize:none;min-height:72px;padding-top:20px;line-height:1.4;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.fg-row .fg{margin-bottom:0;}
+.pin-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.82rem;}
+.pin-loading{color:var(--pr);display:none;}
+.pin-ok-ic{color:var(--ok);display:none;}
+
+/* ━━━ STEP 1: ADDRESS ━━━ */
+.addr-list{margin-bottom:12px;}
+.addr-card{display:flex;gap:14px;padding:14px;border:1.5px solid var(--bd);border-radius:var(--rs);margin-bottom:9px;cursor:pointer;position:relative;transition:all .2s;background:#fff;}
+.addr-card.sel{border-color:var(--pr);background:var(--prl2);box-shadow:0 0 0 1px var(--prl);}
+.addr-card:hover:not(.sel){border-color:#c4bff8;}
+.addr-radio{width:18px;height:18px;border:2px solid var(--bd);border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.addr-card.sel .addr-radio{border-color:var(--pr);background:var(--pr);}
+.addr-card.sel .addr-radio::after{content:"";width:6px;height:6px;background:#fff;border-radius:50%;}
+.addr-info{flex:1;min-width:0;}
+.addr-name{font-weight:700;font-size:.9rem;color:var(--tx);margin-bottom:3px;}
+.addr-line{font-size:.8rem;color:var(--mu);line-height:1.4;}
+.addr-phone{font-size:.78rem;font-weight:600;color:var(--tx2);margin-top:4px;display:flex;align-items:center;gap:4px;}
+.addr-tag{display:inline-flex;font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--pr);background:var(--prl);padding:2px 7px;border-radius:4px;letter-spacing:.04em;margin-bottom:4px;}
+.add-addr-btn{width:100%;padding:13px;border:1.5px dashed var(--bd);background:#fafafa;color:var(--pr);font-weight:700;cursor:pointer;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;gap:8px;font-size:.88rem;transition:.2s;font-family:var(--fb);}
+.add-addr-btn:hover{border-color:var(--pr);background:var(--prl2);}
+.empty-addr{text-align:center;padding:28px 20px;color:var(--mu);}
+.empty-addr i{font-size:2.2rem;color:var(--bd);display:block;margin-bottom:10px;}
+.empty-addr p{font-size:.85rem;line-height:1.5;}
+
+/* ━━━ STEP 2: SUMMARY ━━━ */
+.prod-preview{display:flex;gap:14px;background:var(--bd2);border-radius:var(--rs);padding:14px;margin-bottom:14px;align-items:flex-start;}
+.prod-img{width:76px;height:76px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);background:#fff;flex-shrink:0;}
+.prod-name{font-weight:700;font-size:.93rem;color:var(--tx);line-height:1.35;margin-bottom:6px;}
+.price-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.price-now{font-family:var(--fh);font-size:1.05rem;font-weight:800;color:var(--pr);}
+.price-was{font-size:.8rem;color:var(--mu);text-decoration:line-through;}
+.price-save{font-size:.72rem;font-weight:700;color:var(--ok);background:var(--okl);padding:2px 7px;border-radius:4px;}
+.bill-table{border-top:1px solid var(--bd);padding-top:14px;}
+.bill-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.87rem;border-bottom:1px solid #f3f4f6;}
+.bill-row:last-child{border:none;}
+.bill-row .key{color:var(--mu);font-weight:500;}
+.bill-row .val{font-weight:600;color:var(--tx2);}
+.bill-row.total{padding-top:12px;font-size:.97rem;}
+.bill-row.total .key{font-weight:700;color:var(--tx);}
+.bill-row.total .val{font-family:var(--fh);font-weight:800;color:var(--tx);font-size:1rem;}
+.bill-row .val.green{color:var(--ok);}
+.delivery-pill{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:var(--rs);font-size:.82rem;font-weight:600;margin-bottom:14px;width:100%;}
+.delivery-pill.ok{background:var(--okl);color:#065f46;}
+.delivery-pill.no{background:#fef2f2;color:#991b1b;}
+.addr-recap{background:var(--bd2);border-radius:var(--rs);padding:12px 14px;margin-bottom:14px;}
+.addr-recap .label{font-size:.7rem;font-weight:700;color:var(--pr);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.addr-recap .text{font-size:.83rem;color:var(--tx2);line-height:1.6;}
+.trust-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.trust-chip{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--mu);background:var(--bd2);padding:5px 10px;border-radius:20px;}
+.trust-chip i{color:var(--ok);}
+
+/* ━━━ STEP 3: PAYMENT ━━━ */
+.pay-opt{display:flex;align-items:center;padding:15px;border:1.5px solid var(--bd);border-radius:var(--rs);margin-bottom:9px;cursor:pointer;transition:all .2s;background:#fff;gap:14px;position:relative;}
+.pay-opt.sel{border-color:var(--pr);background:var(--prl2);}
+.pay-opt:hover:not(.sel){border-color:#c4bff8;}
+.pay-radio{width:18px;height:18px;border:2px solid var(--bd);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.pay-opt.sel .pay-radio{border-color:var(--pr);background:var(--pr);}
+.pay-opt.sel .pay-radio::after{content:"";width:6px;height:6px;background:#fff;border-radius:50%;}
+.pay-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.pay-text{flex:1;}
+.pay-title{font-weight:700;font-size:.9rem;color:var(--tx);}
+.pay-sub{font-size:.75rem;color:var(--mu);margin-top:2px;}
+.pay-pill{font-size:.68rem;font-weight:700;color:var(--ok);background:var(--okl);padding:2px 7px;border-radius:4px;display:inline-block;margin-top:3px;}
+.pay-amount{font-family:var(--fh);font-size:1rem;font-weight:800;color:var(--tx);flex-shrink:0;}
+.pay-amount.green{color:var(--ok);}
+
+/* UPI / QR SECTION */
+.upi-box{background:linear-gradient(145deg,#fafafa,#f3f0ff);border:1.5px solid var(--prl);border-radius:var(--rm);padding:24px 20px;margin-top:14px;text-align:center;display:none;position:relative;}
+.upi-box.show{display:block;animation:sIn .4s cubic-bezier(.22,1,.36,1);}
+.upi-label{font-size:.78rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;}
+.upi-amount{font-family:var(--fh);font-size:2.4rem;font-weight:800;color:var(--pr);margin:6px 0 14px;}
+.qr-wrap{background:#fff;border-radius:14px;padding:14px;display:inline-block;border:1px solid var(--bd);margin-bottom:10px;box-shadow:var(--s1);}
+.qr-img{width:170px;height:170px;display:block;border-radius:8px;}
+.upi-id{font-size:.84rem;color:var(--tx2);margin-bottom:16px;}
+.upi-id strong{color:var(--pr);}
+.sound-ctrl{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--mu);cursor:pointer;transition:.2s;}
+.sound-ctrl.on{color:var(--pr);border-color:var(--pr);background:var(--prl2);}
+.pulse-anim{animation:pulseRing 2s ease-in-out infinite;}
+@keyframes pulseRing{0%{box-shadow:0 4px 16px rgba(92,78,232,.3);}50%{box-shadow:0 4px 28px rgba(92,78,232,.55);}100%{box-shadow:0 4px 16px rgba(92,78,232,.3);}}
+.wa-section{margin-top:18px;padding-top:18px;border-top:1px dashed var(--prl);display:none;animation:sIn .4s ease;}
+.wa-note{background:#e7f8ef;border:1px solid #a7f3d0;border-radius:var(--rs);padding:12px 14px;margin-bottom:13px;display:flex;align-items:flex-start;gap:10px;font-size:.82rem;color:#065f46;line-height:1.5;}
+.wa-note i{flex-shrink:0;font-size:1.1rem;margin-top:1px;}
+
+/* ━━━ BOTTOM SHEET (address form) ━━━ */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;opacity:0;visibility:hidden;transition:.3s;backdrop-filter:blur(4px);}
+.sheet-overlay.on{opacity:1;visibility:visible;}
+.sheet{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;z-index:800;transform:translateY(100%);transition:transform .38s cubic-bezier(.22,1,.36,1);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sheet-overlay.on .sheet{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;background:var(--bd);border-radius:2px;margin:12px auto 16px;}
+.sheet-header{display:flex;justify-content:space-between;align-items:center;padding:0 18px 16px;border-bottom:1px solid var(--bd);}
+.sheet-header h3{font-family:var(--fh);font-size:.97rem;font-weight:700;}
+.sheet-close{width:30px;height:30px;border-radius:8px;background:var(--bd2);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--mu);}
+.sheet-body{padding:18px;}
+.geo-request{background:linear-gradient(135deg,var(--okl),#d1fae5);border:1.5px solid #a7f3d0;border-radius:var(--rs);padding:13px 15px;margin-bottom:16px;display:flex;align-items:center;gap:11px;font-size:.83rem;color:#065f46;font-weight:600;}
+.geo-request i{font-size:1.1rem;flex-shrink:0;}
+.geo-pulse{animation:geoPulse 2s ease-in-out infinite;}
+@keyframes geoPulse{0%,100%{opacity:1;}50%{opacity:.65;}}
+
+/* ━━━ SUCCESS OVERLAY ━━━ */
+.success-ov{position:fixed;inset:0;background:rgba(10,10,30,.92);display:flex;align-items:center;justify-content:center;z-index:9000;opacity:0;visibility:hidden;transition:opacity .4s;}
+.success-ov.show{opacity:1;visibility:visible;}
+.success-inner{text-align:center;padding:32px;}
+.ck-svg{width:100px;height:100px;display:block;margin:0 auto;}
+.ck-circle{fill:var(--ok);}
+.ck-path{stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:48;stroke-dashoffset:48;}
+.success-title{color:#fff;font-family:var(--fh);font-size:1.4rem;font-weight:800;margin-top:18px;opacity:0;}
+.success-sub{color:rgba(255,255,255,.7);font-size:.85rem;margin-top:6px;opacity:0;}
+
+/* ━━━ TOAST ━━━ */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:#111827;color:#fff;padding:10px 20px;border-radius:50px;font-size:.83rem;font-weight:600;opacity:0;visibility:hidden;transition:all .3s;z-index:5000;display:flex;align-items:center;gap:8px;box-shadow:var(--s3);max-width:88%;width:max-content;font-family:var(--fb);}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+.toast.ok i{color:#34d399;}
+.toast.er i{color:#f87171;}
+.toast.wa i{color:#fbbf24;}
+.toast.in i{color:#60a5fa;}
+
+#recaptcha-container{position:absolute;bottom:0;opacity:0;pointer-events:none;overflow:hidden;height:0;}
+</style>
+</head>
+<body>
+
+<audio id="bgSound" src="pay1.mp3" loop></audio>
+<audio id="paidSound" src="ihavepaid.mp3"></audio>
+<audio id="orderSound" src="order.mp3"></audio>
+
+<!-- LOADER -->
+<div id="pgLoad">
+  <div class="ld-bag">
+    <div class="ld-body">
+      <svg class="ld-svg" viewBox="0 0 40 40">
+        <path class="ld-t" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z"/>
+        <path class="ld-p" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <button class="nav-back" id="navBack" onclick="handleBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <span class="nav-title" id="navTitle">Checkout</span>
+    <div class="nav-secure"><i class="fas fa-shield-halved"></i> Secure</div>
+    <div class="nav-user-chip" id="navChip"><i class="fas fa-user-circle"></i><span id="navName"></span></div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ━━━ AUTH PANEL ━━━ -->
+  <div id="authPanel" class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-top">
+        <div class="auth-top-icon"><i class="fas fa-lock-open"></i></div>
+        <h2>Sign in to Continue</h2>
+        <p>Verify your identity to place the order securely</p>
+        <div class="auth-features">
+          <div class="auth-feat-chip"><i class="fas fa-bolt"></i> 30 seconds</div>
+          <div class="auth-feat-chip"><i class="fas fa-shield-halved"></i> 100% safe</div>
+          <div class="auth-feat-chip"><i class="fas fa-repeat"></i> One-time only</div>
+        </div>
+      </div>
+      <div class="auth-bottom" id="recaptcha-container">
+        <!-- Phone OTP section -->
+        <div id="authPhWrap">
+          <div class="lim-ban" id="limBan" style="display:none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>OTP limit reached for today — please use Google to continue.</span>
+          </div>
+
+          <div id="authPhoneStep">
+            <div style="font-size:.82rem;font-weight:600;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+              <i class="fas fa-mobile-alt" style="color:var(--pr);"></i> Phone Number
+            </div>
+            <div class="ph-row" style="margin-bottom:12px;">
+              <div class="ph-flag">&#127470;&#127475; +91</div>
+              <input type="tel" id="authPhone" class="ph-input" placeholder="Enter 10-digit number" maxlength="10" inputmode="numeric">
+            </div>
+            <button class="btn btn-primary" id="btnSendOtp"><i class="fas fa-paper-plane"></i> Get OTP</button>
+          </div>
+
+          <div class="otp-section" id="authOtpStep">
+            <div class="otp-meta">OTP sent to <strong id="otpNumDisplay"></strong></div>
+            <div class="otp-row">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text" autocomplete="one-time-code">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text">
+              <input class="otp-b" maxlength="1" inputmode="numeric" type="text">
+            </div>
+            <button class="btn btn-primary" id="btnVerifyOtp"><i class="fas fa-check-circle"></i> Verify & Continue</button>
+            <div class="otp-meta2" style="margin-top:11px;">
+              Didn't receive? <button class="re-btn" id="btnResend" disabled>Resend in <span id="rTimerDisp">1:30</span></button>
+            </div>
+            <button class="btn btn-secondary" id="btnChgNum" style="margin-top:9px;padding:10px;">
+              <i class="fas fa-arrow-left"></i> Change Number
+            </button>
+            <div class="g-sug" id="gSugBox" style="display:none;">
+              <i class="fas fa-lightbulb"></i>
+              <span>Having trouble? <strong style="color:var(--pr);cursor:pointer;" id="gSugBtn">Sign in with Google instead</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" id="authOrDiv">OR</div>
+        <button class="btn btn-google" id="btnGoogle">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" width="18">
+          Continue with Google
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ CHECKOUT FLOW ━━━ -->
+  <div id="checkoutFlow" style="display:none;">
+
+    <!-- STEPPER (inside a card) -->
+    <div class="card" style="margin-bottom:14px;border-radius:var(--rm);">
+      <div class="stepper" style="padding:14px 20px;">
+        <div class="s-dot-wrap">
+          <div class="s-dot act" id="sd1">1</div>
+          <div class="s-lbl">Address</div>
+        </div>
+        <div class="s-line" id="sl1"></div>
+        <div class="s-dot-wrap">
+          <div class="s-dot" id="sd2">2</div>
+          <div class="s-lbl">Summary</div>
+        </div>
+        <div class="s-line" id="sl2"></div>
+        <div class="s-dot-wrap">
+          <div class="s-dot" id="sd3">3</div>
+          <div class="s-lbl">Payment</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: ADDRESS -->
+    <div id="step1" class="step-vw on">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title"><i class="fas fa-map-pin"></i> Choose Delivery Address</div>
+          <div id="addrListEl" class="addr-list"></div>
+          <button class="add-addr-btn" id="btnAddNew">
+            <i class="fas fa-plus-circle"></i> Add New Address
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: SUMMARY -->
+    <div id="step2" class="step-vw">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title"><i class="fas fa-receipt"></i> Order Summary</div>
+          <div class="prod-preview">
+            <img id="sumImg" class="prod-img" src="" alt="Product">
+            <div style="flex:1;min-width:0;">
+              <div class="prod-name" id="sumName">Loading...</div>
+              <div class="price-strip" style="margin-top:5px;">
+                <span class="price-now" id="sumNow">₹--</span>
+                <span class="price-was" id="sumWas"></span>
+                <span class="price-save" id="sumSave" style="display:none;"></span>
+              </div>
+            </div>
+          </div>
+          <div class="delivery-pill" id="delivPill" style="display:none;">
+            <i class="fas fa-truck"></i><span id="delivText">Checking delivery...</span>
+          </div>
+          <div class="addr-recap">
+            <div class="label">Delivering to</div>
+            <div class="text" id="addrRecap"></div>
+          </div>
+          <div class="bill-table">
+            <div class="bill-row"><span class="key">Item Price</span><span class="val" id="billItem">₹--</span></div>
+            <div class="bill-row"><span class="key">Delivery</span><span class="val green">FREE</span></div>
+            <div class="bill-row"><span class="key">Discount</span><span class="val green" id="billDisc">--</span></div>
+            <div class="bill-row total"><span class="key">Total Payable</span><span class="val" id="billTotal">₹--</span></div>
+          </div>
+          <div class="trust-row">
+            <div class="trust-chip"><i class="fas fa-shield-halved"></i> Safe & Secure</div>
+            <div class="trust-chip"><i class="fas fa-rotate-left"></i> Easy Returns</div>
+            <div class="trust-chip"><i class="fas fa-headset"></i> 24/7 Support</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div id="step3" class="step-vw">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+
+          <!-- Online -->
+          <div class="pay-opt" id="optOnline" onclick="selectPay('online')">
+            <div class="pay-radio"></div>
+            <div class="pay-icon-wrap" style="background:linear-gradient(135deg,#fef9c3,#fde68a);">
+              <i class="fas fa-bolt" style="color:#d97706;"></i>
+            </div>
+            <div class="pay-text">
+              <div class="pay-title">Pay Online / UPI</div>
+              <div class="pay-pill" id="onlineSavePill">Save ₹-- on online payment</div>
+            </div>
+            <div class="pay-amount green" id="onlineAmt">₹--</div>
+          </div>
+
+          <!-- COD -->
+          <div class="pay-opt" id="optCod" onclick="selectPay('cod')">
+            <div class="pay-radio"></div>
+            <div class="pay-icon-wrap" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">
+              <i class="fas fa-money-bill-wave" style="color:var(--ok);"></i>
+            </div>
+            <div class="pay-text">
+              <div class="pay-title">Cash on Delivery</div>
+              <div class="pay-sub">Pay when product arrives</div>
+            </div>
+            <div class="pay-amount" id="codAmt">₹--</div>
+          </div>
+
+          <!-- UPI QR Box -->
+          <div class="upi-box" id="upiBox">
+            <button class="sound-ctrl on" id="soundCtrl" onclick="toggleSound()"><i class="fas fa-volume-up"></i></button>
+            <div class="upi-label">Amount to Pay</div>
+            <div class="upi-amount" id="upiAmt">₹--</div>
+            <div class="qr-wrap">
+              <img src="qr.jpg" alt="UPI QR" class="qr-img">
+            </div>
+            <div class="upi-id">UPI ID: <strong>aditya-295@axl</strong></div>
+            <button class="btn btn-primary pulse-anim" id="btnPaid">
+              <i class="fas fa-check-circle"></i> I Have Paid
+            </button>
+            <div class="wa-section" id="waSec">
+              <div class="wa-note">
+                <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+                <div><strong>Almost done!</strong> Send your payment screenshot on WhatsApp to confirm your order instantly.</div>
+              </div>
+              <button class="btn btn-wa" id="btnWa">
+                <i class="fab fa-whatsapp"></i> Send Screenshot & Confirm
+              </button>
+            </div>
+          </div>
+
+          <!-- COD button -->
+          <button class="btn btn-success" id="btnCod" style="display:none;margin-top:14px;">
+            <i class="fas fa-check"></i> Confirm Order (COD)
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /checkoutFlow -->
+</div><!-- /wrap -->
+
+<!-- STICKY BOTTOM BAR -->
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+  <div class="bottom-bar-inner">
+    <div class="bottom-bar-price">
+      <div class="label">Total</div>
+      <div class="amount" id="bbAmt">₹-- <span id="bbOrig"></span></div>
+    </div>
+    <button class="btn btn-primary bottom-bar-btn" id="bbBtn" disabled>
+      Deliver Here <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ADDRESS BOTTOM SHEET -->
+<div class="sheet-overlay" id="sheetOv" onclick="closeSheet(event)">
+  <div class="sheet" id="addrSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="sheetTitle">Add New Address</h3>
+      <button class="sheet-close" onclick="closeSheetDirect()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="sheet-body">
+      <!-- Geo auto-fill status -->
+      <div class="geo-request geo-pulse" id="geoStatus" style="display:none;">
+        <i class="fas fa-location-crosshairs"></i>
+        <span id="geoStatusTxt">Detecting your location...</span>
+      </div>
+
+      <form id="addrForm">
+        <input type="hidden" id="addrIdx" value="-1">
+        <div class="fg">
+          <input type="text" class="fi" id="aN" placeholder=" " required>
+          <label class="fl">Full Name</label>
+        </div>
+        <div class="fg">
+          <input type="tel" class="fi" id="aP" placeholder=" " pattern="[0-9]{10}" required>
+          <label class="fl">Phone Number</label>
+        </div>
+        <div class="fg-row">
+          <div class="fg">
+            <input type="text" class="fi" id="aPin" placeholder=" " pattern="[0-9]{6}" maxlength="6" inputmode="numeric" required>
+            <label class="fl">Pincode</label>
+            <i class="fas fa-spinner fa-spin pin-icon pin-loading" id="pinSpin"></i>
+            <i class="fas fa-check-circle pin-icon pin-ok-ic" id="pinCheck"></i>
+          </div>
+          <div class="fg">
+            <input type="text" class="fi" id="aCt" placeholder=" " required>
+            <label class="fl">City</label>
+          </div>
+        </div>
+        <div class="fg">
+          <select class="fi" id="aSt" required>
+            <option value="" disabled selected></option>
+          </select>
+          <label class="fl">State</label>
+        </div>
+        <div class="fg">
+          <textarea class="fi" id="aTx" placeholder=" " required></textarea>
+          <label class="fl">House No, Street, Area</label>
+        </div>
+        <div class="fg">
+          <input type="text" class="fi" id="aLm" placeholder=" ">
+          <label class="fl">Landmark (Optional)</label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:4px;">
+          <i class="fas fa-check"></i> Save Address
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-ov" id="successOv">
+  <div class="success-inner">
+    <svg class="ck-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="ck-circle" cx="26" cy="26" r="25"/>
+      <path class="ck-path" id="ckPath" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    </svg>
+    <div class="success-title" id="sucTitle">Order Placed!</div>
+    <div class="success-sub" id="sucSub">Redirecting to your order...</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"><i class="fas fa-info-circle"></i><span id="tMsg">Hi</span></div>
+
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPhoneNumber, RecaptchaVerifier,
+         signInWithPopup, GoogleAuthProvider }
+                            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, increment,
+         collection, query, where, getDocs }
+                            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* ── FIREBASE CONFIG ── */
+const FB = initializeApp({
+  apiKey:"AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+  authDomain:"discounthubadmin.firebaseapp.com",
+  projectId:"discounthubadmin",
+  storageBucket:"discounthubadmin.firebasestorage.app",
+  messagingSenderId:"610110627519",
+  appId:"1:610110627519:web:0593a19ddc34fb669ef00a"
+});
+const auth = getAuth(FB), db = getFirestore(FB);
+
+/* ── STATE ── */
+let CU=null, UD=null, CR=null, resInt=null, otpFails=0;
+let userAddresses=[], selAddr=null, selPay='', isSoundOn=true;
+let pincodeSet=new Set(), currentStep=1;
+let cart={ name:'', img:'', codPrice:0, onlinePrice:0, discount:0, slug:'' };
+
+const STATES=["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Jammu and Kashmir","Ladakh","Puducherry"];
+
+/* ── TOAST ── */
+function toast(msg, type='ok') {
+  const t=document.getElementById('toast'), s=document.getElementById('tMsg');
+  s.textContent=msg; t.className='toast show '+type;
+  t.querySelector('i').className={ok:'fas fa-check-circle',er:'fas fa-exclamation-circle',wa:'fas fa-exclamation-triangle',in:'fas fa-info-circle'}[type]||'fas fa-info-circle';
+  setTimeout(()=>t.classList.remove('show'),3400);
+}
+
+/* ── LOADER ── */
+function loader(s){ document.getElementById('pgLoad').classList.toggle('out',!s); }
+
+/* ── INIT STATES ── */
+function fillStates(id) {
+  const s=document.getElementById(id); if(s.options.length>1)return;
+  STATES.forEach(v=>{ const o=document.createElement('option'); o.value=o.textContent=v; s.appendChild(o); });
+}
+fillStates('aSt');
+
+/* ── SMART DISCOUNT LOGIC ── */
+function calcDiscount(codPrice) {
+  return codPrice >= 500 ? 50 : 30;
+}
+
+/* ── PRODUCT PARSE ── */
+function parseProduct() {
+  const p=new URLSearchParams(window.location.search);
+  const name=decodeURIComponent(p.get('product')||'Premium Product');
+  const codPrice=parseInt(p.get('codprice')||p.get('price'))||999;
+  const slug=p.get('slug')||name.toLowerCase().replace(/\s+/g,'-').replace(/[^\w-]/g,'');
+  const discount=calcDiscount(codPrice);
+  const onlinePrice=codPrice-discount;
+  let img=decodeURIComponent(p.get('image')||'');
+  const ln=name.toLowerCase();
+  if(ln.includes('airopods pro'))img='pro.jpg';
+  else if(ln.includes('black earpods'))img='bl.jpg';
+  else if(ln.includes('combo necklace'))img='jl.jpg';
+  else if(ln.includes('earrings'))img='earring.jpg';
+  cart={name,img,codPrice,onlinePrice,discount,slug};
+  if(!img||img==='undefined'||img==='null'){cart.img='';fetchProductImg(slug);}
+  // Fill summary UI
+  document.getElementById('sumName').textContent=name;
+  if(cart.img)document.getElementById('sumImg').src=cart.img;
+  document.getElementById('sumNow').textContent='₹'+onlinePrice;
+  document.getElementById('sumWas').textContent='₹'+codPrice;
+  document.getElementById('sumSave').textContent='Save ₹'+discount;
+  document.getElementById('sumSave').style.display='inline';
+  document.getElementById('billItem').textContent='₹'+codPrice;
+  document.getElementById('billDisc').textContent='-₹'+discount+' (Online)';
+  document.getElementById('billTotal').textContent='₹'+onlinePrice;
+  document.getElementById('onlineAmt').textContent='₹'+onlinePrice;
+  document.getElementById('codAmt').textContent='₹'+codPrice;
+  document.getElementById('onlineSavePill').textContent='Save ₹'+discount+' on this order!';
+  document.getElementById('upiAmt').textContent='₹'+onlinePrice;
+  document.getElementById('bbOrig').textContent='₹'+codPrice;
+}
+
+async function fetchProductImg(slug) {
+  try{
+    const q=query(collection(db,'products'),where('slug','==',slug));
+    const sn=await getDocs(q);
+    if(!sn.empty){const d=sn.docs[0].data();const im=(d.images&&d.images[0])||d.poster||d.image||d.imageUrl||'';if(im){cart.img=im;document.getElementById('sumImg').src=im;}}
+  }catch(e){}
+}
+
+/* ── PINCODE CSV ── */
+async function loadPincodes() {
+  for(const f of['Pincode Serviceability.csv','Pincode Serviceability (1).csv','Pincode Serviceability (2).csv']){
+    try{const r=await fetch(f);if(r.ok){const t=await r.text();t.split('\n').forEach(l=>{if(l.includes('Yes')||l.includes('True')||l.includes('Y')){const pin=l.split(',')[0]?.replace(/"/g,'').trim();if(pin&&pin.length===6)pincodeSet.add(pin);}});}}catch(e){}
+  }
+}
+
+/* ── OTP LIMIT ── */
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+async function getOtpCnt(){try{const s=await getDoc(doc(db,'otpStats',todayKey()));return s.exists()?s.data().count||0:0;}catch(e){return 0;}}
+async function incOtpCnt(){try{await setDoc(doc(db,'otpStats',todayKey()),{count:increment(1),date:todayKey()},{merge:true});}catch(e){}}
+
+async function checkLimit(){
+  const cnt=await getOtpCnt(),over=cnt>=10;
+  const wrap=document.getElementById('authPhWrap');
+  const ban=document.getElementById('limBan');
+  const orD=document.getElementById('authOrDiv');
+  if(over){wrap.style.cssText='max-height:0;overflow:hidden;opacity:0;pointer-events:none;margin:0;';ban.style.display='flex';orD.style.display='none';}
+  else{wrap.style.cssText='';ban.style.display='none';orD.style.display='flex';}
+  return over;
+}
+
+/* ── RECAPTCHA ── */
+function initRC(){
+  if(window._rcV)return;
+  try{
+    window._rcV=new RecaptchaVerifier(auth,'recaptcha-container',{size:'invisible',callback:()=>{},'expired-callback':resetRC});
+    window._rcV.render().then(id=>{window._rcW=id;}).catch(()=>{});
+  }catch(e){}
+}
+function resetRC(){try{if(window._rcW!==undefined&&window.grecaptcha)window.grecaptcha.reset(window._rcW);}catch(e){}}
+
+/* ── TIMER ── */
+function startTimer(){
+  let s=90;const el=document.getElementById('rTimerDisp'),btn=document.getElementById('btnResend');
+  btn.disabled=true;clearInterval(resInt);
+  resInt=setInterval(()=>{s--;const m=Math.floor(s/60),sc=s%60;el.textContent=m+':'+(sc<10?'0':'')+sc;if(s<=0){clearInterval(resInt);btn.disabled=false;btn.textContent='Resend OTP';}},1000);
+}
+
+/* ── OTP BOX KEYBOARD ── */
+function setupOtpBoxes(){
+  const bxs=document.querySelectorAll('.otp-b');
+  bxs.forEach((b,i)=>{
+    b.addEventListener('input',()=>{b.value=b.value.replace(/\D/g,'').slice(-1);b.classList.toggle('filled',b.value!=='');if(b.value&&i<bxs.length-1)bxs[i+1].focus();});
+    b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!b.value&&i>0){bxs[i-1].value='';bxs[i-1].classList.remove('filled');bxs[i-1].focus();}});
+    b.addEventListener('paste',e=>{const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(txt.length===6){bxs.forEach((bx,ix)=>{bx.value=txt[ix]||'';bx.classList.toggle('filled',!!bx.value);});bxs[5].focus();}e.preventDefault();});
+  });
+}
+
+/* ── WEB OTP API ── */
+async function tryAutoOTP(){
+  if(!('OTPCredential'in window))return;
+  try{
+    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),60000);
+    const cr=await navigator.credentials.get({otp:{transport:['sms']},signal:ctrl.signal});
+    if(cr?.code){const bxs=document.querySelectorAll('.otp-b');[...cr.code].forEach((c,i)=>{if(bxs[i]){bxs[i].value=c;bxs[i].classList.add('filled');}});toast('OTP auto-filled!','ok');setTimeout(()=>document.getElementById('btnVerifyOtp').click(),500);}
+  }catch(e){}
+}
+
+/* ── SEND OTP ── */
+async function sendOtp(){
+  const over=await checkLimit();if(over){toast('Daily limit reached. Use Google.','wa');return;}
+  const raw=document.getElementById('authPhone').value.trim();
+  if(!/^\d{10}$/.test(raw)){toast('Enter a valid 10-digit number','er');return;}
+  const btn=document.getElementById('btnSendOtp');
+  btn.innerHTML="<i class='fas fa-spinner fa-spin'></i> Sending...";btn.disabled=true;
+  resetRC();
+  try{
+    CR=await signInWithPhoneNumber(auth,'+91'+raw,window._rcV);
+    await incOtpCnt();
+    document.getElementById('otpNumDisplay').textContent='+91 '+raw;
+    document.getElementById('authPhoneStep').style.display='none';
+    document.getElementById('authOtpStep').classList.add('on');
+    document.querySelector('.otp-b').focus();
+    startTimer();tryAutoOTP();otpFails=0;
+    document.getElementById('gSugBox').style.display='none';
+  }catch(e){
+    toast(e.message||'Failed to send OTP','er');
+    btn.innerHTML="<i class='fas fa-paper-plane'></i> Get OTP";btn.disabled=false;
+    resetRC();
+  }
+}
+
+/* ── VERIFY OTP ── */
+async function verifyOtp(){
+  const code=[...document.querySelectorAll('.otp-b')].map(b=>b.value).join('');
+  if(code.length!==6){toast('Enter full 6-digit OTP','er');return;}
+  const btn=document.getElementById('btnVerifyOtp');
+  btn.innerHTML="<i class='fas fa-spinner fa-spin'></i> Verifying...";btn.disabled=true;
+  try{await CR.confirm(code);}
+  catch(e){
+    otpFails++;
+    document.querySelectorAll('.otp-b').forEach(b=>{b.classList.add('err');setTimeout(()=>b.classList.remove('err'),450);b.value='';b.classList.remove('filled');});
+    document.querySelector('.otp-b').focus();
+    toast('Incorrect OTP. Please try again.','er');
+    btn.innerHTML="<i class='fas fa-check-circle'></i> Verify & Continue";btn.disabled=false;
+    if(otpFails>=3)document.getElementById('gSugBox').style.display='flex';
+  }
+}
+
+/* ── AUTH STATE ── */
+onAuthStateChanged(auth, async user=>{
+  CU=user;
+  if(user){
+    document.getElementById('authPanel').style.display='none';
+    document.getElementById('checkoutFlow').style.display='block';
+    document.getElementById('bottomBar').style.display='block';
+    const chip=document.getElementById('navChip');chip.classList.add('show');
+    document.getElementById('navName').textContent=user.displayName||(user.phoneNumber||'').replace('+91','')||'User';
+    await loadUserData(user);
+  }else{
+    document.getElementById('authPanel').style.display='block';
+    document.getElementById('checkoutFlow').style.display='none';
+    document.getElementById('bottomBar').style.display='none';
+    document.getElementById('navChip').classList.remove('show');
+    initRC();checkLimit();
+  }
+  loader(false);
+});
+
+/* ── LOAD USER ── */
+async function loadUserData(user){
+  try{
+    const sn=await getDoc(doc(db,'users',user.uid));
+    if(sn.exists()){UD=sn.data();userAddresses=UD.addresses||[];}
+    else{
+      const n=(user.displayName||'').split(' ');
+      UD={uid:user.uid,firstName:n[0]||'',lastName:n.slice(1).join(' ')||'',
+          email:user.email||'',phone:(user.phoneNumber||'').replace('+91',''),
+          addresses:[],profilePicture:user.photoURL||'',loginType:'',
+          createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+      await setDoc(doc(db,'users',user.uid),UD);
+      userAddresses=[];
+    }
+    const ls=localStorage.getItem('dh_addresses');
+    if(!userAddresses.length&&ls){try{const a=JSON.parse(ls);if(a.length){userAddresses=a;await updateDoc(doc(db,'users',user.uid),{addresses:a}).catch(()=>{}); }}catch(e){}}
+    renderAddresses();
+    updateBottomBar();
+  }catch(e){toast('Error loading profile','er');}
+}
+
+/* ── RENDER ADDRESSES ── */
+function renderAddresses(){
+  const c=document.getElementById('addrListEl');c.innerHTML='';
+  if(!userAddresses.length){
+    c.innerHTML='<div class="empty-addr"><i class="fas fa-map-marked-alt"></i><p>No saved addresses.<br>Add one to continue.</p></div>';
+    return;
+  }
+  userAddresses.forEach((a,i)=>{
+    const d=document.createElement('div');d.className='addr-card'+(selAddr===i?' sel':'');
+    d.onclick=()=>{selAddr=i;document.querySelectorAll('.addr-card').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');updateBottomBar();};
+    d.innerHTML=`<div class="addr-radio"></div>
+      <div class="addr-info">
+        <div class="addr-tag">${a.type||'Home'}</div>
+        <div class="addr-name">${a.name}</div>
+        <div class="addr-line">${a.address||a.addressLine||''}, ${a.city}, ${a.state} &ndash; ${a.pincode}</div>
+        <div class="addr-phone"><i class="fas fa-phone-alt" style="font-size:.7rem;color:var(--pr);"></i> ${a.phone}</div>
+      </div>`;
+    c.appendChild(d);
+  });
+  if(selAddr!==null&&userAddresses[selAddr]){
+    const cards=document.querySelectorAll('.addr-card');
+    if(cards[selAddr])cards[selAddr].classList.add('sel');
+  }
+}
+
+/* ── BOTTOM BAR UPDATE ── */
+function updateBottomBar(){
+  const bbBtn=document.getElementById('bbBtn');
+  const bbAmt=document.getElementById('bbAmt');
+  if(currentStep===1){
+    bbBtn.disabled=selAddr===null;
+    bbBtn.innerHTML=selAddr!==null?'Deliver Here <i class="fas fa-arrow-right"></i>':'Select Address';
+    bbAmt.textContent='₹'+cart.codPrice;
+    document.getElementById('bbOrig').textContent='';
+  }else if(currentStep===2){
+    bbBtn.disabled=false;
+    bbBtn.innerHTML='Confirm & Pay <i class="fas fa-arrow-right"></i>';
+    bbAmt.textContent='₹'+cart.onlinePrice;
+    document.getElementById('bbOrig').textContent='₹'+cart.codPrice;
+  }else{
+    document.getElementById('bottomBar').style.display='none';
+  }
+}
+
+/* ── STEP NAV ── */
+function goStep(n){
+  currentStep=n;
+  document.querySelectorAll('.step-vw').forEach(x=>x.classList.remove('on'));
+  document.getElementById('step'+n).classList.add('on');
+  [1,2,3].forEach(i=>{
+    const d=document.getElementById('sd'+i);
+    d.className='s-dot'+(i<n?' done':i===n?' act':'');
+    const l=document.getElementById('sl'+i);
+    if(l)l.className='s-line'+(i<n?' done':'');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  const titles={1:'Delivery Address',2:'Order Summary',3:'Payment'};
+  document.getElementById('navTitle').textContent=titles[n]||'Checkout';
+  if(n===2)populateSummary();
+  updateBottomBar();
+  // Push history for Android back
+  history.pushState({step:n},'',window.location.href.split('#')[0]+'#step'+n);
+}
+
+window.handleBack=function(){
+  if(currentStep>1){goStep(currentStep-1);}
+  else{window.location.href='index.html';}
+};
+
+window.addEventListener('popstate', e=>{
+  if(e.state&&e.state.step){
+    const prev=e.state.step-1;
+    if(prev>=1){currentStep=e.state.step;goStep(prev);}
+  }else{if(currentStep>1){goStep(currentStep-1);}else{window.history.back();}}
+});
+
+/* ── SUMMARY ── */
+function populateSummary(){
+  const addr=userAddresses[selAddr];if(!addr)return;
+  const recap=`${addr.name}<br>${addr.address||addr.addressLine||''}, ${addr.city}<br>${addr.state} &ndash; ${addr.pincode}<br><i class="fas fa-phone-alt" style="font-size:.7rem;color:var(--pr);"></i> ${addr.phone}`;
+  document.getElementById('addrRecap').innerHTML=recap;
+  const pill=document.getElementById('delivPill');
+  if(pincodeSet.size&&!pincodeSet.has(addr.pincode)){
+    pill.className='delivery-pill no';document.getElementById('delivText').textContent='Delivery may not be available at '+addr.pincode;
+  }else{
+    pill.className='delivery-pill ok';document.getElementById('delivText').textContent='Free delivery to '+addr.pincode;
+  }
+  pill.style.display='flex';
+}
+
+/* ── PAYMENT ── */
+window.selectPay=function(type){
+  selPay=type;
+  document.getElementById('optOnline').classList.toggle('sel',type==='online');
+  document.getElementById('optCod').classList.toggle('sel',type==='cod');
+  const upi=document.getElementById('upiBox');const cod=document.getElementById('btnCod');
+  if(type==='online'){
+    upi.classList.add('show');cod.style.display='none';
+    if(isSoundOn)document.getElementById('bgSound').play().catch(()=>{});
+  }else{
+    upi.classList.remove('show');cod.style.display='flex';
+    document.getElementById('bgSound').pause();document.getElementById('bgSound').currentTime=0;
+  }
+};
+
+window.toggleSound=()=>{
+  isSoundOn=!isSoundOn;const btn=document.getElementById('soundCtrl');
+  if(isSoundOn){document.getElementById('bgSound').play();btn.querySelector('i').className='fas fa-volume-up';btn.classList.add('on');}
+  else{document.getElementById('bgSound').pause();btn.querySelector('i').className='fas fa-volume-mute';btn.classList.remove('on');}
+};
+
+/* ── PAID ── */
+document.getElementById('btnPaid').onclick=()=>{
+  document.getElementById('paidSound').play().catch(()=>{});
+  document.getElementById('bgSound').pause();
+  const btn=document.getElementById('btnPaid');
+  btn.innerHTML="<i class='fas fa-check'></i> Processing...";btn.disabled=true;btn.classList.remove('pulse-anim');
+  setTimeout(()=>{const ws=document.getElementById('waSec');ws.style.display='block';ws.scrollIntoView({behavior:'smooth'});},1000);
+};
+
+document.getElementById('btnWa').onclick=()=>{
+  const ordId='DH-'+Date.now(),addr=userAddresses[selAddr];
+  const msg=`Payment of Rs.${cart.onlinePrice} for ${cart.name} done.\nOrder ID: ${ordId}\nName: ${addr.name}\n(Attaching screenshot...)`;
+  window.open('https://wa.me/918874776201?text='+encodeURIComponent(msg),'_blank');
+  const btn=document.getElementById('btnWa');btn.innerHTML="<i class='fas fa-spinner fa-spin'></i> Verifying...";btn.disabled=true;
+  setTimeout(()=>finalizeOrder(ordId,'Paid Online'),4000);
+};
+
+document.getElementById('btnCod').onclick=()=>{
+  const btn=document.getElementById('btnCod');btn.innerHTML="<i class='fas fa-spinner fa-spin'></i> Placing...";btn.disabled=true;
+  finalizeOrder('DH-'+Date.now(),'COD');
+};
+
+/* ── FINALIZE ── */
+async function finalizeOrder(ordId,status){
+  const addr=userAddresses[selAddr];
+  const amt=status==='COD'?cart.codPrice:cart.onlinePrice;
+  const data={orderId:ordId,userId:CU.uid,userName:CU.displayName||addr.name,userPhone:addr.phone,
+    items:[{productSlug:cart.slug,productName:cart.name,quantity:1,price:amt,thumbnailURL:cart.img}],
+    address:addr,totalAmount:amt,paymentMethod:status==='COD'?'COD':'ONLINE',status:'Placed',
+    statusLog:[{status:'Placed',by:CU.uid,at:new Date()}],createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+  try{
+    await setDoc(doc(db,'orders',ordId),data);
+    document.getElementById('orderSound').play().catch(()=>{});
+    const ov=document.getElementById('successOv');
+    ov.classList.add('show');
+    const box=ov.querySelector('.success-inner');
+    box.style.animation='popBox .55s cubic-bezier(.68,-.55,.27,1.55) forwards';
+    const ck=document.getElementById('ckPath');
+    ck.style.animation='drawCheck .45s cubic-bezier(.65,0,.45,1) .55s forwards';
+    document.getElementById('sucTitle').textContent=status==='COD'?'Order Placed!':'Payment Confirmed!';
+    document.getElementById('sucTitle').style.animation='fadeUp .5s ease .9s forwards';
+    document.getElementById('sucSub').textContent='Redirecting to your order...';
+    document.getElementById('sucSub').style.animation='fadeUp .5s ease 1.1s forwards';
+    setTimeout(()=>window.location.href='details.html?orderId='+ordId,3600);
+  }catch(e){toast('Could not place order: '+e.message,'er');document.getElementById('btnCod').innerHTML='<i class="fas fa-check"></i> Confirm Order (COD)';document.getElementById('btnCod').disabled=false;}
+}
+
+/* ── GEO AUTO (called on sheet open) ── */
+async function autoGeo(){
+  const geoDiv=document.getElementById('geoStatus');const txt=document.getElementById('geoStatusTxt');
+  if(!navigator.geolocation)return;
+  geoDiv.style.display='flex';txt.textContent='Requesting location...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    txt.textContent='Filling address from GPS...';
+    try{
+      const{latitude:lat,longitude:lon}=pos.coords;
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json');
+      const d=await r.json();const a=d.address||{};
+      if(a.postcode){document.getElementById('aPin').value=a.postcode;autoPincode(a.postcode);}
+      const city=a.city||a.town||a.village||a.county||'';if(city)document.getElementById('aCt').value=city;
+      const sr=a.state||'';const m=STATES.find(s=>sr.toLowerCase().includes(s.toLowerCase()));if(m)document.getElementById('aSt').value=m;
+      const area=[a.road||'',a.suburb||a.residential||''].filter(Boolean).join(', ');if(area)document.getElementById('aTx').value=area;
+      txt.textContent='Location detected! Please verify.';
+      setTimeout(()=>{geoDiv.style.display='none';},2500);
+    }catch(e){geoDiv.style.display='none';}
+  },()=>{geoDiv.style.display='none';});
+}
+
+/* ── PINCODE AUTO-DETECT ── */
+async function autoPincode(pin){
+  if(!pin||pin.length!==6)return;
+  document.getElementById('pinSpin').style.display='block';document.getElementById('pinCheck').style.display='none';
+  try{
+    const r=await fetch('https://api.postalpincode.in/pincode/'+pin);const d=await r.json();
+    if(d&&d[0]&&d[0].Status==='Success'&&d[0].PostOffice?.length){
+      const po=d[0].PostOffice[0];
+      if(po.District)document.getElementById('aCt').value=po.District;
+      const st=po.State||'';const m=STATES.find(s=>st.toLowerCase().includes(s.toLowerCase()));if(m)document.getElementById('aSt').value=m;
+      document.getElementById('pinCheck').style.display='block';
+      toast('Location: '+po.District+', '+po.State,'ok');
+    }
+  }catch(e){}
+  document.getElementById('pinSpin').style.display='none';
+}
+
+document.getElementById('aPin').addEventListener('input',e=>{
+  const v=e.target.value.replace(/\D/g,'');e.target.value=v;
+  document.getElementById('pinCheck').style.display='none';
+  if(v.length===6)autoPincode(v);
+});
+
+/* ── ADDRESS FORM ── */
+document.getElementById('addrForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const idx=parseInt(document.getElementById('addrIdx').value);
+  const na={name:document.getElementById('aN').value.trim(),phone:document.getElementById('aP').value.trim(),
+    pincode:document.getElementById('aPin').value.trim(),city:document.getElementById('aCt').value.trim(),
+    state:document.getElementById('aSt').value,address:document.getElementById('aTx').value.trim(),
+    landmark:document.getElementById('aLm').value.trim(),type:'Home',updatedAt:new Date().toISOString()};
+  let list=[...userAddresses];
+  if(idx>=0){list[idx]=na;}else{na.createdAt=new Date().toISOString();list.push(na);}
+  try{
+    await setDoc(doc(db,'users',CU.uid),{addresses:list},{merge:true});
+    userAddresses=list;localStorage.setItem('dh_addresses',JSON.stringify(list));
+    renderAddresses();closeSheetDirect();toast('Address saved!','ok');
+  }catch(err){toast('Error saving address','er');}
+});
+
+/* ── SHEET FUNCTIONS ── */
+window.openSheet=function(idx=-1){
+  document.getElementById('addrForm').reset();document.getElementById('addrIdx').value=idx;
+  document.getElementById('sheetTitle').textContent=idx>=0?'Edit Address':'Add New Address';
+  document.getElementById('pinCheck').style.display='none';document.getElementById('geoStatus').style.display='none';
+  if(UD){
+    document.getElementById('aN').value=((UD.firstName||'')+' '+(UD.lastName||'')).trim();
+    if(UD.phone)document.getElementById('aP').value=UD.phone;
+  }
+  if(idx>=0){const a=userAddresses[idx];document.getElementById('aN').value=a.name;document.getElementById('aP').value=a.phone;document.getElementById('aPin').value=a.pincode;document.getElementById('aCt').value=a.city;document.getElementById('aSt').value=a.state;document.getElementById('aTx').value=a.address||a.addressLine||'';document.getElementById('aLm').value=a.landmark||'';}
+  document.getElementById('sheetOv').classList.add('on');
+  if(idx===-1)setTimeout(autoGeo,400);
+};
+window.closeSheet=function(e){if(e.target===document.getElementById('sheetOv'))closeSheetDirect();};
+window.closeSheetDirect=function(){document.getElementById('sheetOv').classList.remove('on');};
+
+/* ── LISTENERS ── */
+document.getElementById('btnSendOtp').onclick=sendOtp;
+document.getElementById('btnVerifyOtp').onclick=verifyOtp;
+document.getElementById('gSugBtn').onclick=()=>document.getElementById('btnGoogle').click();
+document.getElementById('btnChgNum').onclick=()=>{
+  document.getElementById('authOtpStep').classList.remove('on');
+  document.getElementById('authPhoneStep').style.display='block';
+  document.getElementById('authPhone').value='';
+  document.querySelectorAll('.otp-b').forEach(b=>{b.value='';b.classList.remove('filled');});
+  document.getElementById('btnSendOtp').innerHTML="<i class='fas fa-paper-plane'></i> Get OTP";
+  document.getElementById('btnSendOtp').disabled=false;
+  document.getElementById('gSugBox').style.display='none';
+  clearInterval(resInt);otpFails=0;
+};
+document.getElementById('btnResend').onclick=async()=>{
+  const raw=document.getElementById('authPhone').value.trim();if(!raw)return;
+  const over=await checkLimit();if(over){toast('Daily limit. Use Google.','wa');return;}
+  const btn=document.getElementById('btnResend');btn.textContent='Sending...';btn.disabled=true;
+  resetRC();
+  try{CR=await signInWithPhoneNumber(auth,'+91'+raw,window._rcV);await incOtpCnt();document.querySelectorAll('.otp-b').forEach(b=>{b.value='';b.classList.remove('filled');});startTimer();tryAutoOTP();toast('OTP resent!');}
+  catch(e){toast(e.message,'er');btn.disabled=false;}
+};
+document.getElementById('btnGoogle').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>toast(e.message,'er'));
+document.getElementById('btnAddNew').onclick=()=>openSheet(-1);
+document.getElementById('bbBtn').onclick=()=>{if(currentStep===1&&selAddr!==null){goStep(2);}else if(currentStep===2){goStep(3);}};
+
+/* ── SUCCESS KEYFRAMES ── */
+const sty=document.createElement('style');
+sty.textContent=`
+@keyframes popBox{0%{transform:scale(0);opacity:0;}65%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
+@keyframes drawCheck{to{stroke-dashoffset:0;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}`;
+document.head.appendChild(sty);
+
+/* ── INIT ── */
+setupOtpBoxes();
+parseProduct();
+loadPincodes();
+</script>
+</body>
+</html>

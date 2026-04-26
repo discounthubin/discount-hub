@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Shopping Cart - Discount Hub</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="Review and manage your shopping cart at Discount Hub. Proceed to a secure checkout with exclusive online payment discounts.">
+<link rel="canonical" href="https://discounthub.rf.gd/cart.html">
+<link rel="icon" href="https://discounthub.rf.gd/dh.png" type="image">
+
+<!-- Fonts and Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* CSS Variables (Consistent with your site) */
+:root {
+    --primary: #2563eb; --primary-dark: #1e40af; --primary-light: #3b82f6;
+    --secondary: #f59e0b; --accent: #ef4444; --success: #10b981; --danger: #ef4444;
+    --light: #f8fafc; --dark: #1e293b; --gray: #64748b; --white: #ffffff;
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1); --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --border-radius: 16px;
+}
+
+/* Global Styles */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Inter', sans-serif; color: var(--dark);
+    background-color: var(--light); line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; }
+
+/* Reusable Button Style */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 24px; border: none; border-radius: 12px;
+    font-weight: 600; font-size: 16px; text-decoration: none;
+    cursor: pointer; transition: var(--transition);
+}
+.btn-primary {
+    background: var(--gradient-primary); color: var(--white);
+    box-shadow: var(--shadow-md); width: 100%;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.btn-primary:disabled { background: var(--gray); cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Main Cart Page Styles */
+.cart-page { padding: 80px 0; }
+.page-header { display: flex; align-items: center; justify-content: center; margin-bottom: 40px; position: relative; }
+.cart-title { font-size: clamp(24px, 4vw, 32px); font-weight: 800; text-align: center; color: var(--dark); }
+.back-button {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    background-color: var(--white); color: var(--primary);
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 20px; box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+.back-button:hover { background-color: var(--primary); color: var(--white); transform: translateY(-50%) scale(1.05); }
+
+.cart-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: flex-start; }
+
+/* Cart Item Card */
+.cart-item {
+    position: relative; display: flex; gap: 20px; background: var(--white);
+    padding: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow-md); margin-bottom: 20px;
+}
+.cart-item-image { width: 90px; height: 90px; object-fit: cover; border-radius: 12px; }
+.cart-item-details { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.cart-item-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
+.cart-item-price { font-size: 16px; color: var(--primary); font-weight: 700; margin-bottom: 10px; }
+.cart-item-actions { display: flex; align-items: center; }
+.quantity-control { display: flex; align-items: center; gap: 10px; }
+.quantity-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid #e2e8f0; background: var(--light);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition); font-size: 14px;
+}
+.quantity-btn:hover { background: var(--primary); color: var(--white); }
+.quantity-btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #e9ecef; }
+.quantity-display { font-weight: 700; font-size: 18px; min-width: 25px; text-align: center;}
+
+.close-item-btn {
+    position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 18px;
+    color: var(--gray); cursor: pointer; transition: var(--transition);
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+}
+.close-item-btn:hover { color: var(--danger); transform: scale(1.2); }
+
+/* Billing Details (Desktop) */
+.billing-details {
+    background: var(--white); padding: 32px; border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg); position: sticky; top: 100px;
+}
+.billing-details h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 16px; }
+.summary-row span:first-child { color: var(--gray); }
+.summary-row span:last-child { font-weight: 600; }
+.summary-row.discount-row span:last-child { color: var(--success); } /* For discounts */
+.summary-row.surcharge-row span:last-child { color: var(--danger); } /* For surcharges */
+.summary-row i { margin-right: 6px; }
+.total-divider { height: 1.5px; background: #e2e8f0; margin: 20px 0; }
+.final-total { font-size: 18px; font-weight: 700; }
+.final-total .total-price { font-size: 22px; color: var(--primary); }
+.billing-details .btn-primary { margin-top: 24px; }
+
+/* Empty Cart State */
+.empty-cart-message { text-align: center; padding: 60px 20px; background: var(--white); border-radius: var(--border-radius); }
+.empty-cart-message i { font-size: 60px; color: var(--primary-light); margin-bottom: 24px; }
+.empty-cart-message h2 { font-size: 28px; margin-bottom: 12px; }
+.empty-cart-message p { color: var(--gray); margin-bottom: 32px; }
+.empty-cart-message .btn { width: auto; }
+
+/* MOBILE-FIRST: Fixed Checkout Bar */
+.mobile-checkout-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--white); padding: 16px 20px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #e2e8f0; z-index: 999;
+    align-items: center; justify-content: space-between; gap: 16px;
+}
+.mobile-price-details { text-align: left; }
+.mobile-price-details .total-label { font-size: 14px; color: var(--gray); }
+.mobile-price-details .total-amount { font-size: 22px; font-weight: 800; color: var(--primary); }
+.mobile-checkout-bar .btn { flex-shrink: 0; width: auto; padding: 12px 20px; }
+
+/* Loading Overlay */
+#loading-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+    display: none; justify-content: center; align-items: center;
+    z-index: 9999; flex-direction: column; gap: 20px;
+}
+.spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+#loading-overlay p { font-size: 18px; font-weight: 600; color: var(--primary-dark); }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Responsive Styles for Mobile */
+@media (max-width: 768px) {
+    .cart-layout { grid-template-columns: 1fr; }
+    .billing-details { display: none; }
+    .mobile-checkout-bar { display: flex; }
+    .cart-page { padding-bottom: 120px; }
+    .cart-item-title { padding-right: 30px; }
+}
+</style>
+</head>
+<body>
+
+<main class="cart-page">
+    <div class="container">
+        <div class="page-header">
+            <a href="#" id="back-button" class="back-button" aria-label="Go back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="cart-title">Your Shopping Cart</h1>
+        </div>
+        <div class="cart-layout">
+            <div class="cart-items-list" id="cart-items-container"></div>
+            <aside class="billing-details" id="billing-details"></aside>
+        </div>
+    </div>
+</main>
+
+<div class="mobile-checkout-bar" id="mobile-checkout-bar">
+    <div class="mobile-price-details">
+        <div class="total-label">Payable Amount (Online)</div>
+        <div class="total-amount" id="mobile-total-price">₹0.00</div>
+    </div>
+    <button class="btn btn-primary" id="mobile-checkout-btn">Checkout</button>
+</div>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Finalizing your order...</p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const MAX_QUANTITY = 5;
+    const INACTIVITY_TIMEOUT = 180000; // 3 minutes (180,000 ms)
+
+    const state = { cart: [] };
+    let inactivityTimer;
+
+    const elements = {
+        backButton: document.getElementById('back-button'),
+        cartItemsContainer: document.getElementById('cart-items-container'),
+        billingDetails: document.getElementById('billing-details'),
+        mobileCheckoutBar: document.getElementById('mobile-checkout-bar'),
+        loadingOverlay: document.getElementById('loading-overlay'),
+        mobileTotalPrice: document.getElementById('mobile-total-price'),
+        mobileCheckoutBtn: document.getElementById('mobile-checkout-btn'),
+    };
+
+    function init() {
+        loadCartFromStorage();
+        render();
+        setupEventListeners();
+        resetInactivityTimer();
+    }
+
+    function handleInactivity() {
+        window.location.href = 'index.html';
+    }
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(handleInactivity, INACTIVITY_TIMEOUT);
+    }
+
+    function loadCartFromStorage() {
+        const cartData = localStorage.getItem('cart');
+        state.cart = cartData ? JSON.parse(cartData) : [];
+    }
+
+    function saveCartToStorage() {
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+    }
+
+    function render() {
+        if (state.cart.length === 0) {
+            renderEmptyCart();
+        } else {
+            renderCartItems();
+            renderBillingDetails();
+            elements.billingDetails.style.display = '';
+            elements.mobileCheckoutBar.style.display = '';
+        }
+        updateAllSummaries();
+    }
+
+    function renderEmptyCart() {
+        elements.cartItemsContainer.innerHTML = `
+            <div class="empty-cart-message">
+                <i class="fas fa-shopping-cart"></i>
+                <h2>Your Cart is Empty</h2>
+                <p>Start adding products to see them here.</p>
+                <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        `;
+        elements.billingDetails.innerHTML = '';
+        elements.billingDetails.style.display = 'none';
+        elements.mobileCheckoutBar.style.display = 'none';
+    }
+
+    function renderCartItems() {
+        elements.cartItemsContainer.innerHTML = state.cart.map(item => `
+            <div class="cart-item" data-id="${item.id}">
+                <button class="close-item-btn" data-id="${item.id}" aria-label="Remove item"><i class="fas fa-times"></i></button>
+                <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <h3 class="cart-item-title">${item.name}</h3>
+                    <p class="cart-item-price">₹${item.price.toFixed(2)}</p>
+                    <div class="cart-item-actions">
+                        <div class="quantity-control">
+                            <button class="quantity-btn decrease-qty" data-id="${item.id}" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
+                            <span class="quantity-display">${item.quantity}</span>
+                            <button class="quantity-btn increase-qty" data-id="${item.id}" aria-label="Increase quantity" ${item.quantity >= MAX_QUANTITY ? 'disabled' : ''}><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderBillingDetails() {
+        const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let specialRow = '';
+
+        if (state.cart.length === 1) {
+            const surcharge = subtotal * 0.20;
+            specialRow = `
+                <div class="summary-row surcharge-row">
+                    <span><i class="fas fa-exclamation-circle"></i> Single Item Charge (20%)</span>
+                    <span>+ ₹${surcharge.toFixed(2)}</span>
+                </div>
+            `;
+        } else if (state.cart.length > 1) {
+            const discount = subtotal * 0.20;
+            specialRow = `
+                <div class="summary-row discount-row">
+                    <span><i class="fas fa-tags"></i> Online Discount (20%)</span>
+                    <span>- ₹${discount.toFixed(2)}</span>
+                </div>
+            `;
+        }
+        
+        elements.billingDetails.innerHTML = `
+            <h2>Billing Details</h2>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="desktop-subtotal">₹${subtotal.toFixed(2)}</span>
+            </div>
+            ${specialRow}
+            <hr class="total-divider">
+            <div class="summary-row final-total">
+                <span>Pay Online</span>
+                <span class="total-price" id="desktop-online-total">₹0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Cash on Delivery</span>
+                <span id="desktop-cod-total">₹0.00</span>
+            </div>
+            <button class="btn btn-primary" id="desktop-checkout-btn">Proceed to Checkout</button>
+        `;
+        document.getElementById('desktop-checkout-btn')?.addEventListener('click', handleCheckout);
+    }
+    
+    function updateItemDisplay(productId) {
+        const item = state.cart.find(p => p.id === productId);
+        if (!item) return;
+        const itemElement = document.querySelector(`.cart-item[data-id="${productId}"]`);
+        if (!itemElement) return;
+        itemElement.querySelector('.quantity-display').textContent = item.quantity;
+        itemElement.querySelector('.increase-qty').disabled = item.quantity >= MAX_QUANTITY;
+    }
+
+    function updateQuantity(productId, change) {
+        const item = state.cart.find(p => p.id === productId);
+        if (!item) return;
+        if (change > 0 && item.quantity >= MAX_QUANTITY) return;
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            removeItem(productId);
+        } else {
+            saveCartToStorage();
+            updateItemDisplay(productId);
+            renderBillingDetails(); // Re-render summary for price changes
+            updateAllSummaries();
+        }
+    }
+
+    function removeItem(productId) {
+        state.cart = state.cart.filter(p => p.id !== productId);
+        saveCartToStorage();
+        render(); // Full re-render needed
+    }
+
+    function updateAllSummaries() {
+        if (state.cart.length === 0) return;
+        
+        const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let onlineTotal, codTotal;
+
+        if (state.cart.length === 1) {
+            const surcharge = subtotal * 0.20;
+            onlineTotal = subtotal;
+            codTotal = subtotal + surcharge;
+        } else { // 2 or more items
+            const discount = subtotal * 0.20;
+            onlineTotal = subtotal - discount;
+            codTotal = subtotal;
+        }
+
+        // Update Desktop Summary
+        const desktopOnlineTotal = document.getElementById('desktop-online-total');
+        if (desktopOnlineTotal) {
+            desktopOnlineTotal.textContent = `₹${onlineTotal.toFixed(2)}`;
+            document.getElementById('desktop-cod-total').textContent = `₹${codTotal.toFixed(2)}`;
+        }
+        
+        // Update Mobile Bar
+        elements.mobileTotalPrice.textContent = `₹${onlineTotal.toFixed(2)}`;
+        
+        const isDisabled = state.cart.length === 0;
+        const desktopBtn = document.getElementById('desktop-checkout-btn');
+        if(desktopBtn) desktopBtn.disabled = isDisabled;
+        elements.mobileCheckoutBtn.disabled = isDisabled;
+    }
+    
+    function goBack() {
+        if (document.referrer && new URL(document.referrer).hostname === window.location.hostname) {
+            window.history.back();
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+
+    function setupEventListeners() {
+        ['mousemove', 'mousedown', 'keypress', 'touchstart', 'scroll'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+        elements.backButton.addEventListener('click', (e) => { e.preventDefault(); goBack(); });
+        elements.cartItemsContainer.addEventListener('click', handleCartAction);
+        elements.mobileCheckoutBtn.addEventListener('click', handleCheckout);
+    }
+
+    function handleCartAction(e) {
+        const button = e.target.closest('button');
+        if (!button) return;
+        const productId = parseInt(button.dataset.id);
+        if (!productId) return;
+
+        if (button.classList.contains('increase-qty')) updateQuantity(productId, 1);
+        else if (button.classList.contains('decrease-qty')) updateQuantity(productId, -1);
+        else if (button.classList.contains('close-item-btn')) removeItem(productId);
+    }
+    
+    function handleCheckout() {
+        if (state.cart.length === 0) return;
+        clearTimeout(inactivityTimer);
+        elements.loadingOverlay.style.display = 'flex';
+
+        setTimeout(() => {
+            const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let onlinePrice, codPrice;
+
+            if (state.cart.length === 1) {
+                onlinePrice = subtotal;
+                codPrice = subtotal * 1.20;
+            } else {
+                onlinePrice = subtotal * 0.80;
+                codPrice = subtotal;
+            }
+            
+            const productNames = state.cart.map(item => item.name).join(' & ');
+            const params = new URLSearchParams({
+                product: productNames,
+                price: Math.round(onlinePrice),
+                codprice: Math.round(codPrice)
+            });
+            window.location.href = `checkout.html?${params.toString()}`;
+        }, 1500);
+    }
+
+    init();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Orders - Discount Hub</title>
+    <link rel="icon" href="dh.png" type="image/png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- 1. CORE VARIABLES & RESET --- */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --nav-height: 65px;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font-main); background-color: var(--background); color: var(--text-main); line-height: 1.5; padding-bottom: 80px; overflow-x: hidden; }
+
+        /* --- 2. LAYOUT & NAVIGATION --- */
+        .navbar { background: var(--surface); box-shadow: var(--shadow-sm); position: fixed; top: 0; width: 100%; z-index: 50; height: var(--nav-height); }
+        .nav-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+
+        .main-container { max-width: 800px; margin: calc(var(--nav-height) + 20px) auto 0; padding: 0 20px; min-height: 80vh; }
+
+        /* --- 3. COMPONENTS --- */
+        .page-header { margin-bottom: 24px; }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
+
+        /* Order Cards */
+        .order-card { background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); transition: transform 0.2s; position: relative; overflow: hidden; }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); flex-wrap: wrap; gap: 10px; }
+        
+        .order-id-grp { display: flex; flex-direction: column; }
+        .order-id { font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .order-date { font-size: 0.8rem; color: var(--text-muted); }
+
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px; }
+        .status-placed { background: #e0e7ff; color: #4338ca; }
+        .status-packed { background: #ffedd5; color: #c2410c; }
+        .status-shipped { background: #ccfbf1; color: #0f766e; }
+        .status-transit { background: #e0f2fe; color: #0369a1; }
+        .status-out { background: #fef9c3; color: #a16207; }
+        .status-delivered { background: #dcfce7; color: #15803d; }
+        .status-cancelled { background: #fee2e2; color: #b91c1c; }
+
+        /* Items List */
+        .order-items { margin-bottom: 16px; }
+        .order-item { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .item-thumb { width: 60px; height: 60px; border-radius: 8px; background: #f1f5f9; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
+        .item-details { flex: 1; }
+        .item-name { font-weight: 600; font-size: 0.95rem; line-height: 1.3; color: var(--text-main); display: block; text-decoration: none; }
+        .item-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+        .legacy-badge { font-size: 0.65rem; background: #f1f5f9; color: var(--text-muted); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); margin-left: 6px; vertical-align: middle; }
+
+        /* Review Buttons */
+        .review-actions { margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-review { 
+            background: var(--surface); border: 1px solid var(--primary); color: var(--primary); 
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 20px; font-weight: 600;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 5px; 
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-review:hover { background: var(--primary-light); }
+        .review-status-text { font-size: 0.75rem; color: var(--success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;}
+
+        /* Price Breakdown */
+        .price-summary { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-muted); }
+        .price-row.total { font-weight: 700; color: var(--text-main); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 1rem; }
+
+        /* Action Buttons */
+        .action-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; border: none; gap: 8px; text-decoration: none; min-width: 100px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-secondary:hover { background: #f8fafc; border-color: var(--text-muted); }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .btn-danger:hover { background: #fecaca; }
+        /* Style for disabled-look return button */
+        .btn-disabled-look { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; cursor: pointer; }
+        
+        /* Timeline Collapsible */
+        .timeline-container { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }
+        .timeline-toggle { background: none; border: none; color: var(--primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 0; }
+        .timeline-content { display: none; margin-top: 12px; padding-left: 8px; }
+        .timeline-content.show { display: block; }
+        .timeline-item { position: relative; padding-left: 20px; padding-bottom: 16px; border-left: 2px solid var(--border); }
+        .timeline-item:last-child { border-left: 2px solid transparent; }
+        .timeline-dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; position: absolute; left: -6px; top: 4px; }
+        .timeline-status { font-weight: 600; font-size: 0.9rem; }
+        .timeline-date { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Review Popup */
+        .review-popup { 
+            position: fixed; bottom: 20px; right: 20px; width: 320px;
+            background: var(--surface); padding: 20px; border-radius: var(--radius-md); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--border); 
+            z-index: 2000; transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .review-popup.show { transform: translateY(0); }
+        .popup-header { font-weight: 700; font-size: 1rem; color: var(--text-main); display: flex; justify-content: space-between; align-items: flex-start; }
+        .popup-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
+        .popup-actions { display: flex; gap: 10px; margin-top: 5px; }
+        .popup-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; line-height: 1; }
+        
+        @media (max-width: 480px) { 
+            .review-popup { left: 15px; right: 15px; width: auto; bottom: 85px; } 
+        }
+
+        /* Empty & Login States */
+        .state-container { text-align: center; padding: 60px 20px; display: none; }
+        .state-icon { font-size: 3rem; color: #cbd5e1; margin-bottom: 20px; }
+        .state-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
+        .state-desc { color: var(--text-muted); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(2px); }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: var(--radius-md); padding: 24px; transform: scale(0.95); transition: 0.3s; }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        textarea.form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin: 15px 0; font-family: inherit; resize: vertical; min-height: 80px; }
+
+        /* Mobile Nav */
+        .mobile-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.03); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 500; transition: 0.2s; flex: 1; height: 100%; }
+        .nav-item i { font-size: 1.25rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 500; opacity: 0; visibility: hidden; transition: 0.3s; z-index: 3000; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); width: max-content; max-width: 90%; text-align: center; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* --- NEW D-BAG LOADING ANIMATION --- */
+#pageLoader { 
+    position: fixed; inset: 0; background: white; z-index: 7000; 
+    display: flex; justify-content: center; align-items: center; 
+    flex-direction: column; gap: 20px; 
+    transition: opacity 0.4s; 
+}
+
+/* JS Logic ke liye zaroori class */
+#pageLoader.fade-out { 
+    opacity: 0; 
+    pointer-events: none; 
+}
+
+/* Bag Container */
+.d-logo-loader {
+    position: relative;
+    width: 80px; height: 90px;
+    animation: floatBag 2s ease-in-out infinite;
+}
+
+/* Bag Handle */
+.d-logo-loader::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 30px;
+    border: 4px solid #0f172a; border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+}
+
+/* Bag Body (Blue Gradient) */
+.d-bag-body {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 75px;
+    background: linear-gradient(135deg, #00C6FF, #0072FF);
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 114, 255, 0.3);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+}
+
+/* SVG D Logic */
+.d-svg {
+    width: 50px; height: 50px; fill: none;
+}
+/* Base D (Faint White) */
+.d-track {
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 5; stroke-linecap: round;
+}
+/* Progress D (Glowing White Animation) */
+.d-progress {
+    stroke: #ffffff;
+    stroke-width: 5; stroke-linecap: round;
+    stroke-dasharray: 110; 
+    stroke-dashoffset: 110; 
+    animation: drawD 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 2px rgba(255,255,255,0.8));
+}
+
+.loading-text { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    font-weight: 600; color: #334155; font-size: 1.1rem; letter-spacing: 1px; 
+}
+
+@keyframes floatBag {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+@keyframes drawD {
+    0% { stroke-dashoffset: 110; }   /* Start Empty */
+    50% { stroke-dashoffset: 0; }     /* Full Draw */
+    100% { stroke-dashoffset: -110; } /* Erase */
+}
+        @media (min-width: 768px) {
+            .mobile-nav { display: none; }
+            body { padding-bottom: 40px; }
+        }
+    </style>
+</head>
+<body>
+<div id="pageLoader">
+
+    <div class="d-logo-loader">
+
+        <div class="d-bag-body">
+
+            <svg class="d-svg" viewBox="0 0 40 40">
+
+                <path class="d-track" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z" />
+
+                <path class="d-progress" d="M12 8 H18 C28 8 28 32 18 32 H12 V8 Z" />
+
+            </svg>
+
+        </div>
+
+    </div>
+
+    <div class="loading-text">Loading Your Orders...</div>
+
+</div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Discount Hub</a>
+            <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">My Orders</div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <div id="view-guest-login" class="state-container">
+            <i class="fas fa-lock state-icon"></i>
+            <h2 class="state-title">Login to view orders</h2>
+            <p class="state-desc">Sign in with your account to access your complete order history, track shipments, and manage returns.</p>
+            <a href="settings.html" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">Login / Sign Up</a>
+        </div>
+
+        <div id="view-empty" class="state-container">
+            <i class="fas fa-box-open state-icon"></i>
+            <h2 class="state-title">No orders yet</h2>
+            <p class="state-desc">Looks like you haven't placed any orders yet. Start shopping to grab the best deals!</p>
+            <a href="index.html" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">Start Shopping</a>
+        </div>
+
+        <div id="orders-list">
+            </div>
+
+    </div>
+
+    <div id="reviewPopup" class="review-popup">
+        <div class="popup-header">
+            <span>Delivered! 🎉</span>
+            <button class="popup-close" onclick="app.dismissReviewPopup()">×</button>
+        </div>
+        <p class="popup-text">Your order has been delivered. Would you like to review your product?</p>
+        <div class="popup-actions">
+            <button class="btn btn-secondary" style="padding: 8px;" onclick="app.dismissReviewPopup()">Not Now</button>
+            <button class="btn btn-primary" style="padding: 8px;" id="popupReviewBtn">Write Review</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 10px; font-size: 1.1rem;">Cancel Order?</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Are you sure you want to cancel this order? This action cannot be undone.</p>
+            <textarea id="cancelReason" class="form-input" placeholder="Reason for cancellation (required)"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="app.closeModal()">Keep Order</button>
+                <button class="btn btn-danger" style="flex: 1;" id="confirmCancelBtn">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"><i class="fas fa-info-circle"></i> <span id="toastMsg">Notification</span></div>
+
+    <div class="mobile-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="index.html#products" class="nav-item">
+            <i class="fas fa-bag-shopping"></i>
+            <span>Shop</span>
+        </a>
+        <a href="details.html" class="nav-item active">
+            <i class="fas fa-box-archive"></i>
+            <span>Orders</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+
+    <script type="module">
+        // --- 1. FIREBASE IMPORTS & CONFIG ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            where, 
+            orderBy, 
+            onSnapshot, 
+            doc, 
+            getDoc,
+            updateDoc, 
+            getDocs,
+            limit,
+            arrayUnion, 
+            serverTimestamp,
+            increment 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+            authDomain: "discounthubadmin.firebaseapp.com",
+            projectId: "discounthubadmin",
+            storageBucket: "discounthubadmin.firebasestorage.app",
+            messagingSenderId: "610110627519",
+            appId: "1:610110627519:web:0593a19ddc34fb669ef00a"
+        };
+
+        const appInstance = initializeApp(firebaseConfig);
+        const auth = getAuth(appInstance);
+        const db = getFirestore(appInstance);
+
+        // --- 2. GLOBAL STATE & CONFIG ---
+        let currentUser = null;
+        let ordersUnsubscribe = null;
+        let orderToCancelId = null;
+        
+        // Caches user reviews: { productSlug: reviewData }
+        let userReviewsMap = new Map();
+        let activeReviewOrder = null;
+
+        // Legacy Products Map
+        const LEGACY_PRODUCTS = {
+            "airopods-pro": "https://discounthub.rf.gd/airopods-pro.html",
+            "boat-earpods-black-edition": "https://discounthub.rf.gd/boat-earpods-black-edition.html",
+            "combojawellary": "https://discounthub.rf.gd/combojawellary.html",
+            "earrings": "https://discounthub.rf.gd/earrings.html"
+        };
+        const LEGACY_FALLBACK_IMG = "https://placehold.co/100x100?text=Legacy";
+
+        // --- 3. UI CONTROLLER ---
+        const app = {
+            init: () => {
+                app.checkAuth();
+                app.setupListeners();
+            },
+
+            toggleLoader: (show) => {
+                const el = document.getElementById('pageLoader');
+                show ? el.classList.remove('fade-out') : el.classList.add('fade-out');
+            },
+
+            showToast: (msg, type = 'info') => {
+                const toast = document.getElementById('toast');
+                const msgEl = document.getElementById('toastMsg');
+                const icon = toast.querySelector('i');
+                msgEl.textContent = msg;
+                toast.className = `toast show ${type}`;
+                icon.className = type === 'error' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            },
+
+            formatCurrency: (amount) => {
+                return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+            },
+
+            formatDate: (timestamp) => {
+                if (!timestamp) return 'N/A';
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return new Intl.DateTimeFormat('en-IN', { 
+                    day: 'numeric', month: 'short', year: 'numeric', 
+                    hour: '2-digit', minute: '2-digit' 
+                }).format(date);
+            },
+
+            getStatusMeta: (status) => {
+                const s = (status || '').toLowerCase();
+                if (s.includes('placed')) return { class: 'status-placed', icon: 'fa-clipboard-check' };
+                if (s.includes('packed')) return { class: 'status-packed', icon: 'fa-box' };
+                if (s.includes('shipped')) return { class: 'status-shipped', icon: 'fa-shipping-fast' };
+                if (s.includes('transit')) return { class: 'status-transit', icon: 'fa-truck-moving' };
+                if (s.includes('out')) return { class: 'status-out', icon: 'fa-motorcycle' };
+                if (s.includes('delivered')) return { class: 'status-delivered', icon: 'fa-check-double' };
+                if (s.includes('cancel')) return { class: 'status-cancelled', icon: 'fa-ban' };
+                return { class: 'status-placed', icon: 'fa-circle' }; // Default
+            }
+        };
+
+        // --- 4. AUTH & ORDER FETCHING ---
+        app.checkAuth = () => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = { uid: user.uid, type: 'auth' };
+                    // 1. Fetch User Reviews First
+                    await app.fetchUserReviews(user.uid);
+                    // 2. Then Subscribe Orders
+                    app.subscribeToOrders(user.uid);
+                    document.getElementById('view-guest-login').style.display = 'none';
+                } else {
+                    const guestId = localStorage.getItem('dh_guest_id');
+                    if (guestId) {
+                        currentUser = { uid: guestId, type: 'guest' };
+                        app.subscribeToOrders(guestId);
+                        document.getElementById('view-guest-login').style.display = 'none';
+                    } else {
+                        app.toggleLoader(false);
+                        if(ordersUnsubscribe) ordersUnsubscribe();
+                        document.getElementById('orders-list').innerHTML = '';
+                        document.getElementById('view-guest-login').style.display = 'block';
+                        document.getElementById('view-empty').style.display = 'none';
+                    }
+                }
+            });
+        };
+
+        app.fetchUserReviews = async (uid) => {
+            try {
+                const q = query(collection(db, "reviews"), where("uid", "==", uid));
+                const snap = await getDocs(q);
+                userReviewsMap.clear();
+                snap.forEach(doc => {
+                    const r = doc.data();
+                    if(r.productSlug) userReviewsMap.set(r.productSlug, r);
+                });
+            } catch (e) {
+                console.error("Error fetching reviews", e);
+            }
+        };
+
+        app.subscribeToOrders = (userId) => {
+            if(ordersUnsubscribe) ordersUnsubscribe(); 
+
+            const q = query(
+                collection(db, "orders"), 
+                where("userId", "==", userId), 
+                orderBy("createdAt", "desc")
+            );
+
+            ordersUnsubscribe = onSnapshot(q, (snapshot) => {
+                app.toggleLoader(false);
+                const orders = [];
+                snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
+                
+                if (orders.length === 0) {
+                    document.getElementById('view-empty').style.display = 'block';
+                    document.getElementById('orders-list').innerHTML = '';
+                } else {
+                    document.getElementById('view-empty').style.display = 'none';
+                    app.renderOrders(orders);
+                }
+            }, (error) => {
+                console.error("Error fetching orders:", error);
+                app.toggleLoader(false);
+                app.showToast("Failed to load orders", 'error');
+            });
+        };
+
+        // --- 5. PRODUCT & IMAGE LOGIC ---
+        async function resolveProductImage(item) {
+            if (item.thumbnailURL) return { url: item.thumbnailURL, isLegacy: false, link: null };
+            if (LEGACY_PRODUCTS[item.productSlug]) {
+                return { url: LEGACY_FALLBACK_IMG, isLegacy: true, link: LEGACY_PRODUCTS[item.productSlug] };
+            }
+            try {
+                const q = query(collection(db, "products"), where("slug", "==", item.productSlug), limit(1));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    const pData = snap.docs[0].data();
+                    const img = (pData.images && pData.images.length > 0) ? pData.images[0] : (pData.poster || pData.imageURL);
+                    return { url: img || LEGACY_FALLBACK_IMG, isLegacy: false, link: null };
+                }
+            } catch (e) { console.error("Prod fetch err", e); }
+            return { url: "https://placehold.co/100x100?text=No+Img", isLegacy: false, link: null };
+        }
+
+        // --- 6. RENDER LOGIC ---
+        app.renderOrders = async (orders) => {
+            const container = document.getElementById('orders-list');
+            container.innerHTML = ''; 
+            
+            let popupCandidate = null;
+
+            for (const order of orders) {
+                const statusMeta = app.getStatusMeta(order.status);
+                const isCancellable = ["Placed", "Packed"].includes(order.status);
+                const isDelivered = order.status.toLowerCase() === 'delivered';
+                
+                // Delivery Time Check (for Review Logic)
+                let showReviewUI = false;
+                let deliveredDate = null;
+                
+                if (isDelivered && currentUser.type === 'auth') {
+                    // Try to find delivery date from log, else fallback
+                    const log = (order.statusLog || []).find(l => l.status === 'Delivered');
+                    deliveredDate = log ? (log.at.toDate ? log.at.toDate() : new Date(log.at)) : (order.updatedAt ? order.updatedAt.toDate() : new Date());
+                    
+                    const daysDiff = (new Date() - deliveredDate) / (1000 * 60 * 60 * 24);
+                    if (daysDiff <= 30) showReviewUI = true;
+                }
+
+                let itemsHtml = '';
+                let totalItems = 0;
+
+                for (const item of (order.items || [])) {
+                    totalItems += (item.quantity || 1);
+                    const imgData = await resolveProductImage(item);
+                    
+                    const titleHtml = imgData.isLegacy && imgData.link
+                        ? `<a href="${imgData.link}" target="_blank" class="item-name">${item.productName} <i class="fas fa-external-link-alt" style="font-size:0.7em"></i></a>`
+                        : `<span class="item-name">${item.productName}</span>`;
+
+                    const badgeHtml = imgData.isLegacy ? `<span class="legacy-badge">Legacy</span>` : '';
+
+                    // Review Button Logic
+                    let reviewBtnHtml = '';
+                    if (showReviewUI && item.productSlug) {
+                        const existingReview = userReviewsMap.get(item.productSlug);
+                        const reviewUrl = `review.html?slug=${item.productSlug}&orderId=${order.id}`;
+
+                        if (existingReview) {
+                            // Check 24h edit window
+                            const reviewTime = existingReview.createdAt.toDate();
+                            const hrsDiff = (new Date() - reviewTime) / (1000 * 60 * 60);
+                            
+                            if (hrsDiff < 24) {
+                                reviewBtnHtml = `
+                                    <div class="review-actions">
+                                        <a href="${reviewUrl}" class="btn-review">
+                                            <i class="fas fa-pen"></i> Edit Review
+                                        </a>
+                                    </div>`;
+                            } else {
+                                reviewBtnHtml = `<div class="review-status-text"><i class="fas fa-check-circle"></i> Reviewed</div>`;
+                            }
+                        } else {
+                            // Not Reviewed Yet
+                            reviewBtnHtml = `
+                                <div class="review-actions">
+                                    <a href="${reviewUrl}" class="btn-review">
+                                        <i class="fas fa-star"></i> Write Review
+                                    </a>
+                                </div>`;
+                            
+                            // Check for Popup Candidate (First unreviewed item of most recent delivered order)
+                            if (!popupCandidate && !localStorage.getItem(`dh_review_dismissed_${order.id}`)) {
+                                popupCandidate = { orderId: order.id, slug: item.productSlug };
+                            }
+                        }
+                    }
+
+                    itemsHtml += `
+                        <div class="order-item">
+                            <img src="${imgData.url}" class="item-thumb" alt="Product" loading="lazy">
+                            <div class="item-details">
+                                ${titleHtml}
+                                <div class="item-meta">
+                                    Qty: ${item.quantity} | ${app.formatCurrency(item.price)}
+                                    ${badgeHtml}
+                                </div>
+                                ${reviewBtnHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Timeline HTML
+                let timelineHtml = '';
+                if (order.statusLog && order.statusLog.length > 0) {
+                    order.statusLog.forEach(log => {
+                        timelineHtml += `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-status">${log.status}</div>
+                                <div class="timeline-date">${app.formatDate(log.at)} ${log.note ? '- ' + log.note : ''}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    timelineHtml = `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-status">${order.status}</div><div class="timeline-date">${app.formatDate(order.updatedAt || order.createdAt)}</div></div>`;
+                }
+
+                const subtotal = order.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+                const finalTotal = order.totalAmount || subtotal; 
+
+                // NEW: Return Button HTML
+                // We use 'btn-secondary btn-disabled-look' to act like a disabled button
+                const returnBtnHtml = `
+                    <button class="btn btn-secondary btn-disabled-look" onclick="app.handleReturnClick('${order.status}')">
+                        <i class="fas fa-undo"></i> Return
+                    </button>
+                `;
+
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                card.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id-grp">
+                            <div class="order-id">Order #${order.orderId || order.id.slice(0,8).toUpperCase()}</div>
+                            <div class="order-date">Placed: ${app.formatDate(order.createdAt)}</div>
+                        </div>
+                        <div class="status-pill ${statusMeta.class}">
+                            <i class="fas ${statusMeta.icon}"></i> ${order.status}
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        ${itemsHtml}
+                    </div>
+
+                    <div class="price-summary">
+                        <div class="price-row"><span>Payment Method</span> <span>${order.paymentMethod || 'COD'}</span></div>
+                        <div class="price-row total"><span>Total Amount</span> <span>${app.formatCurrency(finalTotal)}</span></div>
+                    </div>
+
+                    <div class="timeline-container">
+                        <button class="timeline-toggle" onclick="this.nextElementSibling.classList.toggle('show')">
+                            See Status History <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="timeline-content">
+                            ${timelineHtml}
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <a href="track.html?orderId=${order.id}" class="btn btn-primary">
+                            <i class="fas fa-map-location-dot"></i> Track
+                        </a>
+                        ${isCancellable ? `
+                            <button class="btn btn-danger" onclick="window.openCancelModal('${order.id}')">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        ` : ''}
+                        ${returnBtnHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+
+            // Trigger Popup if candidate found
+            if (popupCandidate) {
+                activeReviewOrder = popupCandidate;
+                setTimeout(() => {
+                    document.getElementById('reviewPopup').classList.add('show');
+                }, 1500); 
+            }
+        };
+
+        // --- 7. ACTIONS & LISTENERS ---
+        
+        // NEW: Return Button Handler
+        app.handleReturnClick = (status) => {
+            if (status && status.toLowerCase() === 'delivered') {
+                // Feature currently disabled even if delivered, as per instruction to just show message
+                app.showToast("Return available when order is delivered (Feature coming soon)");
+            } else {
+                app.showToast("Return available when order is delivered");
+            }
+        };
+
+        // Popup Actions
+        app.dismissReviewPopup = () => {
+            const popup = document.getElementById('reviewPopup');
+            popup.classList.remove('show');
+            if (activeReviewOrder) {
+                localStorage.setItem(`dh_review_dismissed_${activeReviewOrder.orderId}`, 'true');
+            }
+        };
+
+        document.getElementById('popupReviewBtn').addEventListener('click', () => {
+            if (activeReviewOrder) {
+                window.location.href = `review.html?slug=${activeReviewOrder.slug}&orderId=${activeReviewOrder.orderId}`;
+            }
+        });
+
+        // Modal & Cancel Logic
+        window.openCancelModal = (orderId) => {
+            orderToCancelId = orderId;
+            document.getElementById('cancelModal').classList.add('show');
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('cancelReason').focus();
+        };
+
+        app.closeModal = () => {
+            document.getElementById('cancelModal').classList.remove('show');
+            orderToCancelId = null;
+        };
+        // Expose to window for onclick
+        window.app = app; 
+
+        document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
+            if (!orderToCancelId) return;
+            const reason = document.getElementById('cancelReason').value.trim();
+            
+            if (!reason) {
+                alert("Please provide a reason for cancellation.");
+                return;
+            }
+
+            app.toggleLoader(true);
+            try {
+                const orderRef = doc(db, "orders", orderToCancelId);
+                
+                // NEW: Need to fetch order details first to know items for restocking
+                const orderSnapshot = await getDoc(orderRef);
+                if (!orderSnapshot.exists()) {
+                    throw new Error("Order not found");
+                }
+                const orderData = orderSnapshot.data();
+
+                // 1. Cancel the Order
+                await updateDoc(orderRef, {
+                    status: "Cancelled",
+                    cancelledBy: "user", 
+                    cancelledAt: serverTimestamp(),
+                    statusLog: arrayUnion({
+                        status: "Cancelled",
+                        by: currentUser.uid,
+                        at: new Date(), 
+                        note: reason
+                    })
+                });
+
+                // 2. Restock Logic (NEW FEATURE: Add stock back on cancel)
+                if (orderData.items && Array.isArray(orderData.items)) {
+                    const restockPromises = orderData.items.map(async (item) => {
+                        // We need to find the product document by slug first
+                        if (!item.productSlug) return;
+                        
+                        const q = query(collection(db, "products"), where("slug", "==", item.productSlug), limit(1));
+                        const productSnap = await getDocs(q);
+                        
+                        if (!productSnap.empty) {
+                            const productDoc = productSnap.docs[0];
+                            // Increment stock by quantity cancelled
+                            await updateDoc(productDoc.ref, {
+                                stock: increment(item.quantity || 1)
+                            });
+                        }
+                    });
+                    await Promise.all(restockPromises);
+                }
+
+                app.showToast("Order cancelled & stock updated");
+                app.closeModal();
+            } catch (error) {
+                console.error("Cancel failed", error);
+                app.showToast("Unable to cancel. Please contact support.", 'error');
+            }
+            app.toggleLoader(false);
+        });
+
+        app.setupListeners = () => {
+            document.getElementById('cancelModal').addEventListener('click', (e) => {
+                if(e.target === document.getElementById('cancelModal')) app.closeModal();
+            });
+        };
+
+        // Init
+        app.init();
+
+    </script>
+</body>
+</html>

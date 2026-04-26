@@ -1,0 +1,213 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Order - Discount Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Base Styles (Consistent) --- */
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4d44db;
+            --accent-color: #ff6584;
+            --dark-color: #2d2d2d;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --success-color: #28a745; /* Green for WhatsApp */
+            --danger-color: #dc3545;   /* Red for cancel theme */
+            --danger-hover-color: #c82333;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.6;
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { width: 100%; max-width: 650px; margin: 0 auto; padding: 0 15px; }
+
+        /* --- Button Styles --- */
+        .btn {
+            display: inline-block; padding: 12px 28px; border: none; border-radius: 30px; cursor: pointer;
+            text-decoration: none; font-weight: 600; font-size: 16px; transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center; line-height: 1.5;
+        }
+        .btn i { margin-right: 8px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); }
+
+        .btn-danger { background-color: var(--danger-color); color: var(--white); }
+        .btn-danger:hover { background-color: var(--danger-hover-color); }
+
+        .btn-secondary { background-color: var(--light-gray); color: var(--dark-color); border: 1px solid #ccc; }
+        .btn-secondary:hover { background-color: #ddd; border-color: #bbb; }
+
+        .btn-success { background-color: var(--success-color); color: var(--white); }
+        .btn-success:hover { background-color: #218838; }
+
+        .btn-primary { background-color: var(--primary-color); color: var(--white); }
+        .btn-primary:hover { background-color: var(--secondary-color); }
+
+
+        /* --- Navbar Styles (Minimal) --- */
+        .navbar { background-color: var(--white); box-shadow: var(--box-shadow); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; height: 60px; max-width: 1200px; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-color); text-decoration: none; white-space: nowrap; }
+        .nav-links, .mobile-menu-btn, .cart-icon, .search-bar { display: none; }
+
+        /* --- Cancel Section --- */
+        .cancel-section-wrapper {
+            padding-top: 100px; padding-bottom: 60px; flex-grow: 1;
+            display: flex; align-items: center;
+        }
+
+        .cancel-card {
+            background-color: var(--white); padding: 35px 40px; border-radius: 12px;
+            box-shadow: var(--box-shadow); text-align: center; width: 100%;
+            border-top: 5px solid var(--danger-color); animation: fadeInCard 0.5s ease-out;
+        }
+        @keyframes fadeInCard { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .cancel-card h2 {
+            font-size: 24px; margin-bottom: 15px; color: var(--danger-color);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .cancel-card h2 i { font-size: 22px; }
+
+        .cancel-card p { font-size: 16px; color: var(--dark-color); margin-bottom: 30px; }
+
+        /* Step Containers */
+        .step-container {
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out, max-height 0.5s ease-out;
+            overflow: hidden;
+        }
+        .step-container.hidden {
+            opacity: 0; transform: scale(0.98); max-height: 0; padding-top: 0;
+            padding-bottom: 0; margin-top: 0; margin-bottom: 0; pointer-events: none; border: none;
+        }
+
+        /* Button Groups */
+        .button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+
+        #instruction-step h3 { font-size: 20px; margin-bottom: 15px; color: var(--dark-color); font-weight: 600; }
+        #instruction-step p { margin-bottom: 25px; font-size: 15px; color: var(--gray-color); }
+
+        /* --- Footer Styles --- */
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 18px 0; margin-top: 40px; text-align: center; font-size: 13px; }
+
+        /* --- Responsive --- */
+        @media (max-width: 576px) {
+             .cancel-card { padding: 25px 20px; }
+             .cancel-card h2 { font-size: 20px; }
+             .cancel-card p { font-size: 15px; margin-bottom: 25px;}
+             #instruction-step h3 { font-size: 18px; }
+             .button-group .btn { width: 100%; /* Stack buttons */ }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Discount Hub</a>
+        </div>
+    </nav>
+
+    <!-- Cancel Section -->
+    <section class="cancel-section-wrapper">
+        <div class="container">
+            <div class="cancel-card">
+
+                <!-- Step 1: Confirmation -->
+                <div class="step-container" id="confirmation-step">
+                    <h2><i class="fas fa-exclamation-triangle"></i>Confirm Cancellation</h2>
+                    <p>Are you absolutely sure you want to cancel your most recent order?</p>
+                    <div class="button-group">
+                        <button class="btn btn-danger" id="confirm-cancel-btn">
+                            <i class="fas fa-check"></i> Yes, Cancel My Order
+                        </button>
+                        <button class="btn btn-secondary" id="go-back-to-details-btn"> <!-- Changed ID -->
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Instructions -->
+                <div class="step-container hidden" id="instruction-step">
+                     <h2><i class="fas fa-info-circle"></i>Cancellation Instructions</h2>
+                    <h3>Contact Support to Cancel</h3>
+                    <p>To proceed with cancellation, please contact our support team via WhatsApp or Phone with your Order ID, Name, and Phone Number.</p>
+                    <div class="button-group">
+                        <a href="https://wa.me/message/QYB7WUT55VS5E1" target="_blank" rel="noopener noreferrer" class="btn btn-success" id="whatsapp-btn">
+                            <i class="fab fa-whatsapp"></i> Message on WhatsApp
+                        </a>
+                        <a href="tel:8874776201" class="btn btn-primary" id="call-btn">
+                            <i class="fas fa-phone-alt"></i> Call Now
+                        </a>
+                    </div>
+                     <div style="margin-top: 30px;">
+                          <button class="btn btn-secondary" id="go-back-to-index-btn"> <!-- Changed ID -->
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                          </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2024 Discount Hub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmationStep = document.getElementById('confirmation-step');
+            const instructionStep = document.getElementById('instruction-step');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const goBackToDetailsBtn = document.getElementById('go-back-to-details-btn'); // Updated ID
+            const goBackToIndexBtn = document.getElementById('go-back-to-index-btn');     // Updated ID
+
+            // Function to show instructions and hide confirmation
+            const showInstructions = () => {
+                confirmationStep.classList.add('hidden');
+                instructionStep.classList.remove('hidden');
+            };
+
+            // Event Listener for "Yes, Cancel" button
+            if (confirmCancelBtn) {
+                confirmCancelBtn.addEventListener('click', showInstructions);
+            }
+
+            // **UPDATED** Event Listener for "Go Back" button (from confirmation step)
+            if (goBackToDetailsBtn) {
+                goBackToDetailsBtn.addEventListener('click', () => {
+                    window.location.href = 'details.html'; // Go to details.html
+                });
+            }
+
+            // **UPDATED** Event Listener for "Back to Home" button (from instructions step)
+            if (goBackToIndexBtn) {
+                goBackToIndexBtn.addEventListener('click', () => {
+                    window.location.href = 'index.html'; // Go to index.html
+                });
+            }
+        });
+    </script>
+</body>
+</html

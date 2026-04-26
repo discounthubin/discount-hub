@@ -1,0 +1,561 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Your Cart - Discount Hub</title>
+    <link rel="icon" href="/dh.png" type="image/png"> <!-- FAVICON ADDED -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Theme: Modern Teal & Orange (Original Theme) --- */
+        :root {
+            --primary-color: #20c997; /* Teal */
+            --secondary-color: #1a9875; /* Darker Teal */
+            --accent-color: #fd7e14; /* Orange */
+            --dark-color: #2d3748; /* Darker Gray for text */
+            --light-color: #f7fafc; /* Very Light Gray background */
+            --gray-color: #6c757d; /* Standard Gray */
+            --light-gray: #e2e8f0; /* Lighter Gray for borders/dividers */
+            --white: #ffffff;
+            --success-color: #28a745;
+            --success-darker: #1e7e34;
+            --error-color: #e53e3e; /* Red */
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.6;
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+        .container { width: 100%; max-width: 650px; margin: 0 auto; padding: 0 20px; }
+
+        .btn {
+            display: flex; align-items: center; justify-content: center;
+            background-color: var(--primary-color); color: var(--white);
+            padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;
+            text-decoration: none; font-weight: 600; font-size: 16px; transition: var(--transition);
+            box-shadow: var(--box-shadow); text-align: center; width: 100%;
+        }
+        .btn i { margin-right: 10px; }
+        .btn:hover:not(:disabled) { background-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .btn:disabled { background-color: var(--gray-color) !important; opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+        .btn.highlight { animation: pulseTheme 1.5s infinite; }
+        @keyframes pulseTheme {
+            0% { box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(32, 201, 151, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(32, 201, 151, 0); }
+        }
+
+        .navbar { background-color: var(--white); box-shadow: var(--box-shadow); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; height: 65px; max-width: 1200px; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-color); text-decoration: none; white-space: nowrap; }
+
+        .checkout-section { padding-top: 90px; padding-bottom: 60px; flex-grow: 1; }
+        .checkout-section h2 { text-align: center; margin-bottom: 35px; font-size: 30px; position: relative; padding-bottom: 15px; color: var(--dark-color); font-weight: 600; }
+        .checkout-section h2::after { content: ''; display: block; width: 80px; height: 4px; background: linear-gradient(90deg, var(--primary-color), var(--accent-color)); margin: 12px auto 0; border-radius: 2px; }
+        .checkout-card { background-color: var(--white); padding: 30px; border-radius: 12px; box-shadow: var(--box-shadow); }
+        .checkout-card h3 { font-size: 22px; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 1px solid var(--light-gray); color: var(--primary-color); font-weight: 600; }
+
+        .product-summary-cart {
+            margin-bottom: 30px; padding: 20px; background-color: #f8f9fa;
+            border: 1px solid var(--light-gray); border-radius: 8px;
+        }
+        .product-summary-cart h4 {
+            font-size: 18px; font-weight: 600; color: var(--dark-color); margin-bottom: 15px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--light-gray);
+        }
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; font-size: 15px;
+        }
+        .cart-item span:first-child { color: var(--dark-color); }
+        .cart-item span:last-child { font-weight: 600; color: var(--secondary-color); }
+        .product-summary-cart hr { border: 0; height: 1px; background-color: var(--light-gray); margin: 15px 0; }
+        .cart-total-display {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 17px; font-weight: 700; color: var(--dark-color); margin-top: 10px;
+        }
+        #selected-cart-total-price { color: var(--accent-color); font-size: 18px;}
+
+        .form-group { margin-bottom: 22px; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--dark-color); }
+        .form-group input[type="text"], .form-group input[type="tel"], .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--light-gray); border-radius: 6px;
+            font-family: 'Poppins', sans-serif; font-size: 15px; transition: var(--transition);
+            background-color: var(--white); appearance: none; color: var(--dark-color);
+        }
+        .form-group input[type="text"]::placeholder, .form-group input[type="tel"]::placeholder, .form-group textarea::placeholder { color: #a0aec0; opacity: 1; }
+        .form-group.select-wrapper { position: relative; }
+        .form-group.select-wrapper::after {
+            content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; right: 15px; top: calc(50% + 12px);
+            transform: translateY(-50%); color: var(--gray-color); pointer-events: none; font-size: 14px;
+        }
+        .form-group select:required:invalid { color: #a0aec0; }
+        .form-group option { color: var(--dark-color); } .form-group option[value=""] { color: #a0aec0; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.2); }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-group input.is-invalid, .form-group select.is-invalid, .form-group textarea.is-invalid { border-color: var(--error-color); }
+        .form-group input.is-invalid:focus, .form-group select.is-invalid:focus, .form-group textarea.is-invalid:focus { box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.25); }
+        .error-message { display: none; color: var(--error-color); font-size: 13px; font-weight: 500; margin-top: 6px; }
+        .form-group label .required-star { color: var(--error-color); margin-left: 2px; }
+
+        .payment-options { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--light-gray); }
+        .payment-options h3 { margin-bottom: 20px; }
+        .payment-option-group {
+            display: flex; align-items: center; margin-bottom: 15px; padding: 15px;
+            border: 2px solid var(--light-gray); border-radius: 8px; cursor: pointer;
+            transition: all 0.2s ease; background-color: var(--white); position: relative;
+        }
+        .payment-option-group:last-child { margin-bottom: 0; }
+        .payment-option-group.selected { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.2); }
+        .payment-option-group.disabled { opacity: 0.6; cursor: not-allowed; background-color: #edf2f7; border-color: #e2e8f0; color: var(--gray-color); }
+        .payment-option-group input[type="radio"] { margin-right: 15px; flex-shrink: 0; transform: scale(1.2); cursor: pointer; accent-color: var(--primary-color); }
+        .payment-option-group input[type="radio"]:disabled { cursor: not-allowed; }
+        .payment-option-label-text { flex-grow: 1; font-size: 16px; font-weight: 500; color: var(--dark-color); cursor: pointer; }
+        .payment-option-group.disabled .payment-option-label-text { color: var(--gray-color); cursor: not-allowed; }
+        .payment-option-price { font-size: 17px; font-weight: 700; color: var(--accent-color); flex-shrink: 0; }
+        .payment-option-group.disabled .payment-option-price { color: var(--gray-color); }
+        #payment-method-error { margin-top: 10px; display: none; }
+
+        #order-placement-area { margin-top: 35px; text-align: center; }
+        #status-message { font-size: 15px; margin-top: 18px; min-height: 22px; font-weight: 500; }
+        #status-message.success { color: var(--success-color); } #status-message.error { color: var(--error-color); }
+
+        .fullscreen-success-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(45, 55, 72, 0.85);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease; pointer-events: none;
+        }
+        .fullscreen-success-overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
+        .success-animation-container { text-align: center; transform: scale(0); }
+        @keyframes popInSuccess { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        .checkmark-fullscreen { width: 110px; height: 110px; display: block; margin: 0 auto; }
+        .checkmark__circle-bg { stroke-width: 0; fill: var(--success-color); transform-origin: center; }
+        @keyframes drawCircleBg { to { transform: scale(1); } }
+        .checkmark__check-fg { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 5; stroke: var(--white); fill: none; }
+        @keyframes drawCheckFg { 100% { stroke-dashoffset: 0; } }
+        .success-message-fullscreen { color: var(--white); font-size: 22px; font-weight: 600; margin-top: 25px; opacity: 0; }
+        @keyframes fadeInTextSuccess { to { opacity: 1; } }
+
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 20px 0; margin-top: 40px; text-align: center; font-size: 14px; }
+
+        @media (min-width: 768px) { .btn { width: auto; } #order-placement-area { text-align: right; } }
+        @media (max-width: 576px) {
+             .checkout-section h2 { font-size: 26px; } .checkout-card { padding: 25px; } .checkout-card h3 { font-size: 20px; }
+             .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 14px; }
+             .btn { padding: 11px 25px; font-size: 15px; } .error-message { font-size: 12px;}
+             .payment-option-label-text, .payment-option-price { font-size: 15px;}
+             .checkmark-fullscreen { width: 90px; height: 90px; } .checkmark__check-fg { stroke-width: 4; }
+             .success-message-fullscreen { font-size: 19px; }
+             .cart-item span { font-size: 14px; } .cart-total-display { font-size: 16px; }
+             #selected-cart-total-price { font-size: 17px;}
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container"> <a href="index.html" class="logo">Discount Hub</a> </div>
+    </nav>
+
+    <section class="checkout-section">
+        <div class="container">
+            <h2>Checkout Your Cart</h2>
+            <div class="checkout-card">
+                <form id="checkout-form" novalidate> <!-- Removed target & method -->
+                    <input type="hidden" id="productName" value=""> <!-- Name attribute removed -->
+                    <input type="hidden" id="orderId" value="">
+                    <input type="hidden" id="paymentMethod" value="">
+                    <input type="hidden" id="finalPrice" value="">
+
+                    <div class="product-summary-cart">
+                        <h4>Order Summary</h4>
+                        <div class="cart-item"> <span>EarPods Pro (Qty: 1)</span> <span>₹324</span> </div>
+                        <div class="cart-item"> <span>AirPods Pro (Qty: 1)</span> <span>₹999</span> </div>
+                        <hr>
+                        <div class="cart-total-display"> <span>Total Amount:</span> <span id="selected-cart-total-price"></span> </div>
+                    </div>
+
+                    <h3>Shipping Details</h3>
+                    <div class="form-group"> <label for="full-name">Full Name <span class="required-star">*</span></label> <input type="text" id="full-name" placeholder="Enter your full name" required aria-describedby="full-name-error"> <span class="error-message" id="full-name-error"></span> </div>
+                    <div class="form-group"> <label for="phone">Phone Number <span class="required-star">*</span></label> <input type="tel" id="phone" placeholder="Enter 10-digit phone number" pattern="[0-9]{10}" required aria-describedby="phone-error" minlength="10" maxlength="10"> <span class="error-message" id="phone-error"></span> </div>
+                    <div class="form-group"> <label for="address">Full Address <span class="required-star">*</span></label> <textarea id="address" placeholder="Street address, area, landmark" required aria-describedby="address-error"></textarea> <span class="error-message" id="address-error"></span> </div>
+                    <div class="form-group"> <label for="pincode">Pincode <span class="required-star">*</span></label> <input type="text" id="pincode" placeholder="Enter 6-digit pincode" pattern="[0-9]{6}" required aria-describedby="pincode-error" maxlength="6"> <span class="error-message" id="pincode-error"></span> </div>
+                    <div class="form-group select-wrapper"> <label for="state">State <span class="required-star">*</span></label> <select id="state" required aria-describedby="state-error"> <option value="" disabled selected>Select your state</option> </select> <span class="error-message" id="state-error"></span> </div>
+
+                    <div class="payment-options">
+                        <h3>Select Payment Method <span class="required-star">*</span></h3>
+                        <div class="payment-option-group" id="online-payment-option-group"> <input type="radio" name="paymentOption" value="Online Payment" id="onlinePaymentRadio" required aria-describedby="payment-method-error"> <label for="onlinePaymentRadio" class="payment-option-label-text">Online Payment (Prepaid)</label> <span class="payment-option-price" id="onlinePriceSpan"></span> </div>
+                        <div class="payment-option-group" id="cod-payment-option-group"> <input type="radio" name="paymentOption" value="Cash on delivery" id="codPaymentRadio" required aria-describedby="payment-method-error"> <label for="codPaymentRadio" class="payment-option-label-text">Cash on Delivery (COD)</label> <span class="payment-option-price" id="codPriceSpan"></span> </div>
+                        <span class="error-message" id="payment-method-error"></span>
+                    </div>
+
+                    <div id="order-placement-area"> <p id="status-message"></p> <button type="button" id="place-order-btn" class="btn"> <i class="fas fa-shopping-cart"></i>Place Order </button> </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="fullscreen-success-overlay" id="fullscreen-success-overlay">
+        <div class="success-animation-container" id="success-animation-container">
+            <svg class="checkmark-fullscreen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"> <circle class="checkmark__circle-bg" cx="26" cy="26" r="25"/> <path class="checkmark__check-fg" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/> </svg>
+            <p class="success-message-fullscreen" id="success-message-fullscreen">Order Placed Successfully!</p>
+        </div>
+    </div>
+    <audio id="orderSound" src="order.mp3" preload="auto"></audio>
+    <footer class="footer"> <div class="footer-bottom"> <div class="container" style="max-width:1200px;"> <p>© 2024 Discount Hub. All Rights Reserved.</p> </div> </div> </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const checkoutForm = document.getElementById('checkout-form');
+            const stateSelect = document.getElementById('state');
+            const pincodeInput = document.getElementById('pincode');
+            const onlinePaymentRadio = document.getElementById('onlinePaymentRadio');
+            const codPaymentRadio = document.getElementById('codPaymentRadio');
+            const onlinePaymentOptionGroup = document.getElementById('online-payment-option-group');
+            const codPaymentOptionGroup = document.getElementById('cod-payment-option-group');
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            const statusMessage = document.getElementById('status-message');
+            const fullscreenSuccessOverlay = document.getElementById('fullscreen-success-overlay');
+            const successAnimationContainer = document.getElementById('success-animation-container');
+            const successMessageFullscreen = document.getElementById('success-message-fullscreen');
+            const checkmarkCircleBg = document.querySelector('.fullscreen-success-overlay .checkmark__circle-bg'); // Scoped selector
+            const checkmarkCheckFg = document.querySelector('.fullscreen-success-overlay .checkmark__check-fg');   // Scoped selector
+            const orderSound = document.getElementById('orderSound');
+            
+            const productNameHiddenInput = document.getElementById('productName');
+            const orderIdHiddenInput = document.getElementById('orderId');
+            const paymentMethodHiddenInput = document.getElementById('paymentMethod');
+            const finalPriceHiddenInput = document.getElementById('finalPrice');
+            
+            const selectedCartTotalPriceSpan = document.getElementById('selected-cart-total-price');
+            const onlinePriceSpan = document.getElementById('onlinePriceSpan');
+            const codPriceSpan = document.getElementById('codPriceSpan');
+
+            let allServiceablePincodesCOD = new Set();
+            let pincodeToStateHintMap = new Map();
+            let pincodeDataLoaded = false;
+
+            // --- Configuration for buy.html ---
+            const CART_PRODUCT_NAME_FOR_FORM = "EarPods Pro (Qty:1), AirPods Pro (Qty:1)"; // Specific for buy.html
+            const onlinePrice = 1199; // Specific for buy.html (combo)
+            const codPrice = 1299;    // Specific for buy.html (combo)
+            const targetPayPage = 'pay1.html'; // Generic payment page for combo
+            
+            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceEg_6mE6ZWpNarwtbphdtofP-I92gkCJdDQ6bW3ujIFMzpg/formResponse';
+            // Google Form Entry IDs (ensure these match your Google Form structure)
+            const GF_NAME_ENTRY = 'entry.473620831';
+            const GF_PHONE_ENTRY = 'entry.1742250096';
+            const GF_ADDRESS_ENTRY = 'entry.1829812267';
+            const GF_PINCODE_ENTRY = 'entry.1848809719';
+            const GF_STATE_ENTRY = 'entry.404668644';
+            const GF_PRODUCT_NAME_ENTRY = 'entry.1197033790';
+            const GF_ORDER_ID_ENTRY = 'entry.366336829';
+            const GF_PAYMENT_METHOD_ENTRY = 'entry.1866163454';
+            const GF_FINAL_PRICE_ENTRY = 'entry.2098835177';
+
+            const postSubmitRedirectDelay = 3500;
+
+            const indianStates = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"];
+            const stateCodeToNameMap = {'AP': 'Andhra Pradesh', 'AR': 'Arunachal Pradesh', 'AS': 'Assam', 'BR': 'Bihar', 'CG': 'Chhattisgarh', 'GA': 'Goa', 'GJ': 'Gujarat', 'HR': 'Haryana', 'HP': 'Himachal Pradesh', 'JH': 'Jharkhand', 'KA': 'Karnataka', 'KL': 'Kerala', 'MP': 'Madhya Pradesh', 'MH': 'Maharashtra', 'MN': 'Manipur', 'ML': 'Meghalaya', 'MZ': 'Mizoram', 'NL': 'Nagaland', 'OR': 'Odisha', 'PB': 'Punjab', 'RJ': 'Rajasthan', 'SK': 'Sikkim', 'TN': 'Tamil Nadu', 'TS': 'Telangana', 'TR': 'Tripura', 'UP': 'Uttar Pradesh', 'UK': 'Uttarakhand', 'WB': 'West Bengal', 'AN': 'Andaman and Nicobar Islands', 'CH': 'Chandigarh', 'DN': 'Dadra and Nagar Haveli and Daman and Diu', 'DD': 'Dadra and Nagar Haveli and Daman and Diu', 'DL': 'Delhi', 'JK': 'Jammu and Kashmir', 'LA': 'Ladakh', 'LD': 'Lakshadweep', 'PY': 'Puducherry', 'PU': 'Puducherry'};
+
+            async function loadPincodeCSV(filePath) { try { const response = await fetch(filePath); if (!response.ok) { console.error(`Failed to load ${filePath}: ${response.statusText}`); if (!statusMessage.textContent.includes('Error loading pincode data')) { statusMessage.textContent = `Error loading pincode data (${filePath.split('/').pop()}). Features might be affected.`; statusMessage.className = 'error'; } return; } const csvText = await response.text(); const lines = csvText.split('\n').map(line => line.trim().replace(/\r$/, '')); if (lines.length < 2) { console.warn(`CSV file ${filePath} is empty or has no data rows.`); return; } const header = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, '')); const pincodeIndex = header.indexOf('pincode'), codAvailabilityIndex = header.indexOf('cod'), fmServiceableIndex = header.indexOf('fm_serviceble'), dispatchCenterIndex = header.indexOf('dispatch center'), stateCodeCsvIndex = header.indexOf('state code'), districtIndex = header.indexOf('district'); if (pincodeIndex === -1) { console.error(`'pincode' column not found in ${filePath}.`); return; } for (let i = 1; i < lines.length; i++) { const line = lines[i]; if (line) { const values = line.split(',').map(v => v.trim().replace(/"/g, '')); const pincode = values[pincodeIndex]; if (pincode && pincode.match(/^\d{6}$/)) { let isCodServiceableThisRow = (codAvailabilityIndex !== -1 && values[codAvailabilityIndex]?.toUpperCase() === 'Y') || (fmServiceableIndex !== -1 && values[fmServiceableIndex]?.toLowerCase() === 'true'); if (isCodServiceableThisRow) allServiceablePincodesCOD.add(pincode); if (!pincodeToStateHintMap.has(pincode)) { let stateHint = null; if (dispatchCenterIndex !== -1 && values[dispatchCenterIndex]) { const dcValue = values[dispatchCenterIndex]; const match = dcValue.match(/\(([^)]+)\)/); if (match && match[1]) { let extracted = match[1].trim(); if (extracted.toLowerCase() === 'delhi ncr') extracted = 'Delhi'; if (extracted.toLowerCase() === 'orissa') extracted = 'Odisha'; if (extracted.toLowerCase() === 'jammu & kashmir') extracted = 'Jammu and Kashmir'; if (indianStates.map(s => s.toLowerCase()).includes(extracted.toLowerCase())) stateHint = indianStates.find(s => s.toLowerCase() === extracted.toLowerCase()); } } if (!stateHint && stateCodeCsvIndex !== -1 && values[stateCodeCsvIndex]) { const stateCode = values[stateCodeCsvIndex].toUpperCase(); if (stateCodeToNameMap[stateCode]) stateHint = stateCodeToNameMap[stateCode]; } if (!stateHint && districtIndex !== -1 && values[districtIndex]) { const districtVal = values[districtIndex].trim(); if (indianStates.map(s => s.toLowerCase()).includes(districtVal.toLowerCase())) stateHint = indianStates.find(s => s.toLowerCase() === districtVal.toLowerCase());} if (stateHint) pincodeToStateHintMap.set(pincode, stateHint); } } } } } catch (error) { console.error(`Error processing ${filePath}:`, error); if (!statusMessage.textContent.includes('Error loading pincode data')) { statusMessage.textContent = `Error processing pincode data from ${filePath.split('/').pop()}. COD & State validation might be affected.`; statusMessage.className = 'error'; } } }
+            async function loadAllPincodeData() { const csvFiles = ['Pincode Serviceability.csv', 'Pincode Serviceability (1).csv', 'Pincode Serviceability (2).csv']; statusMessage.textContent = 'Loading pincode data...'; statusMessage.className = ''; await Promise.all(csvFiles.map(filePath => loadPincodeCSV(filePath))); pincodeDataLoaded = true; console.log("Pincode Data Loading Complete. Total COD-serviceable:", allServiceablePincodesCOD.size, "Total state hints:", pincodeToStateHintMap.size); if (allServiceablePincodesCOD.size === 0 && !statusMessage.textContent.startsWith('Error')) { statusMessage.textContent = 'Cash on Delivery is currently unavailable for all areas. Please choose Online Payment.'; statusMessage.className = 'error'; } else if (statusMessage.textContent === 'Loading pincode data...') { statusMessage.textContent = ''; } 
+                if (allServiceablePincodesCOD.size === 0) {
+                    codPaymentRadio.disabled = true;
+                    codPaymentOptionGroup.classList.add('disabled');
+                    if (!onlinePaymentRadio.checked) onlinePaymentRadio.checked = true;
+                }
+                updatePaymentMethodDisplay(); 
+                updatePlaceOrderButtonState();
+            }
+            await loadAllPincodeData();
+
+            if (stateSelect) indianStates.forEach(state => { const option = document.createElement('option'); option.value = state; option.textContent = state; stateSelect.appendChild(option); });
+
+            function getQueryParam(param) { const urlParams = new URLSearchParams(window.location.search); return urlParams.get(param); }
+            function generateRandomString(length, characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') { let result = ''; const charactersLength = characters.length; for (let i = 0; i < length; i++) { result += characters.charAt(Math.floor(Math.random() * charactersLength)); } return result; }
+            function generateOrderId() { const p1 = "DH", p2 = generateRandomString(4, 'ABCDEFGHJKLMNPQRSTUVWXYZ'), p3 = generateRandomString(5,'123456789'); return `${p1}-${p2}-${p3}`; }
+            async function isPinCodeServiceableForCOD(pin) { if (!pincodeDataLoaded) { return Promise.resolve(false); } return allServiceablePincodesCOD.has(pin); }
+            function validatePincodeState(pincode, selectedState) { if (!pincodeDataLoaded || !pincodeToStateHintMap.size || !selectedState) return { isValid: true, message: "State data not fully available for validation." }; if (pincodeToStateHintMap.has(pincode)) { const mappedState = pincodeToStateHintMap.get(pincode); const normMapped = mappedState.toLowerCase().trim(), normSelected = selectedState.toLowerCase().trim(); if ((normMapped === "orissa" && normSelected === "odisha") || (normMapped === "odisha" && normSelected === "orissa")) return { isValid: true, message: "" }; if (normMapped !== normSelected) return { isValid: false, message: `Pincode ${pincode} seems to be for ${mappedState}, not ${selectedState}.` }; } return { isValid: true, message: "" }; }
+            function showValidationError(element, message) { if (!element) return; element.classList.add('is-invalid'); const errorSpanId = element.getAttribute('aria-describedby'); if (errorSpanId) { const errorSpan = document.getElementById(errorSpanId); if (errorSpan) { errorSpan.textContent = message; errorSpan.style.display = 'block'; } } }
+            function clearValidationError(element) { if (!element) return; element.classList.remove('is-invalid'); const errorSpanId = element.getAttribute('aria-describedby'); if (errorSpanId) { const errorSpan = document.getElementById(errorSpanId); if (errorSpan) { errorSpan.textContent = ''; errorSpan.style.display = 'none'; } } }
+            function clearAllValidationErrors() { checkoutForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid')); document.querySelectorAll('.payment-option-group').forEach(group => group.classList.remove('is-invalid')); checkoutForm.querySelectorAll('.error-message').forEach(el => { el.textContent = ''; el.style.display = 'none'; }); if (statusMessage.textContent !== 'Cash on Delivery is currently unavailable for all areas.' && !statusMessage.textContent.startsWith('Error loading pincode data') && !statusMessage.textContent.startsWith('Error processing pincode data')) { statusMessage.textContent = ''; statusMessage.className = ''; } document.getElementById('payment-method-error').textContent = ''; }
+            function triggerSuccessAnimation() { if (!fullscreenSuccessOverlay || !successAnimationContainer || !checkmarkCircleBg || !checkmarkCheckFg || !successMessageFullscreen || !orderSound) { setTimeout(() => { window.location.href = 'details.html'; }, postSubmitRedirectDelay); return; } successAnimationContainer.style.animation = 'none'; successAnimationContainer.offsetHeight; successAnimationContainer.style.transform = 'scale(0)'; successAnimationContainer.style.opacity = '0'; checkmarkCircleBg.style.animation = 'none'; checkmarkCircleBg.offsetHeight; checkmarkCircleBg.style.transform = 'scale(0)'; checkmarkCheckFg.style.animation = 'none'; checkmarkCheckFg.offsetHeight; checkmarkCheckFg.style.strokeDashoffset = '48'; successMessageFullscreen.style.animation = 'none'; successMessageFullscreen.offsetHeight; successMessageFullscreen.style.opacity = '0'; fullscreenSuccessOverlay.classList.add('show'); setTimeout(() => { successAnimationContainer.style.animation = 'popInSuccess 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards'; checkmarkCircleBg.style.animation = 'drawCircleBg 0.6s ease-out forwards'; checkmarkCheckFg.style.animation = 'drawCheckFg 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards'; successMessageFullscreen.style.animation = 'fadeInTextSuccess 0.5s ease-out 1s forwards'; }, 50); try { orderSound.currentTime = 0; if (orderSound.readyState >= 2) { orderSound.play().catch(e => console.warn("Audio playback prevented:", e)); } else { orderSound.addEventListener('canplaythrough', () => orderSound.play().catch(e => console.warn("Audio playback prevented on canplaythrough:", e)), { once: true }); orderSound.load(); } } catch (e) { console.error("Error playing sound:", e); } setTimeout(() => { window.location.href = 'details.html'; }, postSubmitRedirectDelay); }
+            function saveOrderToHistory(orderData) { try { let userOrders = JSON.parse(localStorage.getItem('userOrders')) || []; const orderWithDate = { ...orderData, orderDate: new Date().toISOString(), deliveryDate: `Est. ${formatDate(addDays(new Date(), 7))}` }; userOrders.unshift(orderWithDate); localStorage.setItem('userOrders', JSON.stringify(userOrders)); localStorage.setItem('isNewOrderPlaced', 'true'); localStorage.setItem('tempUserNameForDetails', orderData.name); } catch (error) { console.error("Failed to save order to history:", error); } }
+            function addDays(date, days) { const result = new Date(date); result.setDate(result.getDate() + days); return result; }
+            function formatDate(date) { if (!(date instanceof Date) || isNaN(date)) return '--'; return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, '-'); }
+            
+            function loadTempOrderData() { 
+                try { 
+                    const tempOrderData = localStorage.getItem('tempOrderData'); 
+                    if (tempOrderData) { 
+                        const data = JSON.parse(tempOrderData); 
+                        if(document.getElementById('full-name')) document.getElementById('full-name').value = data.name || ''; 
+                        if(document.getElementById('phone')) document.getElementById('phone').value = data.phone || ''; 
+                        if(document.getElementById('address')) document.getElementById('address').value = data.address || ''; 
+                        if(pincodeInput) pincodeInput.value = data.pincode || ''; 
+                        if (stateSelect && data.state) { 
+                            const stateOption = stateSelect.querySelector(`option[value="${data.state}"]`); 
+                            if (stateOption) stateOption.selected = true; 
+                        } 
+                        if(orderIdHiddenInput) orderIdHiddenInput.value = data.orderId || generateOrderId(); 
+                        if(productNameHiddenInput) productNameHiddenInput.value = data.productName || CART_PRODUCT_NAME_FOR_FORM; 
+                        if(onlinePaymentRadio) onlinePaymentRadio.checked = true; 
+                        if(paymentMethodHiddenInput) paymentMethodHiddenInput.value = 'Online Payment'; 
+                        if(finalPriceHiddenInput) finalPriceHiddenInput.value = data.finalPrice || onlinePrice; 
+                        updatePaymentMethodDisplay(); 
+                        localStorage.removeItem('tempOrderData'); 
+                        return data; 
+                    } 
+                } catch (error) { console.error("Failed to load temporary order data:", error); } return null; 
+            }
+            function saveTempOrderData() { 
+                const tempOrderData = { 
+                    name: document.getElementById('full-name').value.trim(), 
+                    phone: document.getElementById('phone').value.trim(), 
+                    address: document.getElementById('address').value.trim(), 
+                    pincode: pincodeInput.value.trim(), 
+                    state: stateSelect.value, 
+                    productName: productNameHiddenInput.value, 
+                    orderId: orderIdHiddenInput.value, 
+                    finalPrice: finalPriceHiddenInput.value 
+                }; 
+                try { localStorage.setItem('tempOrderData', JSON.stringify(tempOrderData)); } 
+                catch (error) { console.error("Failed to save temporary order data:", error); } 
+            }
+            async function sendToGoogleForm(formData) { 
+                try { 
+                    await fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' }); 
+                    return true; 
+                } catch (error) { 
+                    console.error('Error sending data to Google Form:', error); 
+                    return false; 
+                } 
+            }
+
+            if (productNameHiddenInput) productNameHiddenInput.value = CART_PRODUCT_NAME_FOR_FORM;
+            if (onlinePriceSpan) onlinePriceSpan.textContent = `₹${onlinePrice}`;
+            if (codPriceSpan) codPriceSpan.textContent = `₹${codPrice}`;
+            if (orderIdHiddenInput && !getQueryParam('payment')) { orderIdHiddenInput.value = generateOrderId(); }
+
+            if (getQueryParam('payment') === 'success') { // Coming back from pay.html after successful payment
+                placeOrderBtn.disabled = true; placeOrderBtn.classList.remove('highlight');
+                placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Completing Order...';
+                loadTempOrderData(); 
+                if (orderIdHiddenInput.value && productNameHiddenInput.value && paymentMethodHiddenInput.value && finalPriceHiddenInput.value) {
+                    const orderToSave = { 
+                        id: orderIdHiddenInput.value, 
+                        name: document.getElementById('full-name').value.trim(), 
+                        phone: document.getElementById('phone').value.trim(), 
+                        address: document.getElementById('address').value.trim(), 
+                        pincode: pincodeInput.value.trim(), 
+                        state: stateSelect.value, 
+                        productName: productNameHiddenInput.value, 
+                        paymentMethod: 'Online Payment', 
+                        finalPrice: finalPriceHiddenInput.value, 
+                    };
+                    saveOrderToHistory(orderToSave); 
+                    triggerSuccessAnimation();
+                } else {
+                    statusMessage.textContent = 'Payment success, but required data missing. Contact support.';
+                    statusMessage.className = 'error'; 
+                    placeOrderBtn.disabled = false; placeOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>Place Order';
+                    updatePlaceOrderButtonState();
+                }
+            } else {
+                if (pincodeInput && pincodeInput.value.trim().length === 6) { pincodeInput.dispatchEvent(new Event('blur')); }
+                else { 
+                    if (allServiceablePincodesCOD.size === 0 || !pincodeInput || pincodeInput.value.trim().length !== 6) {
+                        onlinePaymentRadio.checked = true;
+                        codPaymentRadio.disabled = true;
+                        codPaymentOptionGroup.classList.add('disabled');
+                    }
+                    updatePaymentMethodDisplay(); 
+                }
+                updatePlaceOrderButtonState();
+            }
+
+            if (pincodeInput) {
+                pincodeInput.addEventListener('blur', async () => {
+                    const pin = pincodeInput.value.trim(); const selectedStateValue = stateSelect.value; clearValidationError(pincodeInput);
+                    if (statusMessage.textContent !== 'Cash on Delivery is currently unavailable for all areas.' && !statusMessage.textContent.startsWith('Error loading pincode data') && !statusMessage.textContent.startsWith('Error processing pincode data')) { statusMessage.textContent = ''; statusMessage.className = ''; }
+                    let codWasChecked = codPaymentRadio.checked; codPaymentRadio.disabled = true; codPaymentOptionGroup.classList.add('disabled'); placeOrderBtn.classList.remove('highlight');
+                    if (pin.length === 6) {
+                        if (!statusMessage.textContent.includes('unavailable for all areas')){ statusMessage.textContent = 'Checking PIN code...'; statusMessage.className = ''; }
+                        let isPincodeStateValid = true;
+                        if (selectedStateValue) { const stateValidationResult = validatePincodeState(pin, selectedStateValue); if (!stateValidationResult.isValid) { isPincodeStateValid = false; showValidationError(pincodeInput, stateValidationResult.message); if (!statusMessage.textContent.includes('unavailable for all areas')) { statusMessage.textContent = stateValidationResult.message; statusMessage.className = 'error'; } } }
+                        if (isPincodeStateValid) {
+                           const codServiceable = await isPinCodeServiceableForCOD(pin);
+                           if (codServiceable && allServiceablePincodesCOD.size > 0) { codPaymentRadio.disabled = false; codPaymentOptionGroup.classList.remove('disabled'); if (!statusMessage.textContent.includes('unavailable for all areas') && !statusMessage.textContent.includes('Pincode seems to be for')){ statusMessage.textContent = 'Delivery available for this Pincode.'; statusMessage.className = 'success'; } if (codWasChecked) { codPaymentRadio.checked = true; }
+                           } else {
+                                if (!isPincodeStateValid) {} else if (!codServiceable && !pincodeInput.classList.contains('is-invalid') && allServiceablePincodesCOD.size > 0) { showValidationError(pincodeInput, 'Cash on Delivery not available for this Pincode.'); }
+                                if (!statusMessage.textContent.includes('unavailable for all areas') && !statusMessage.textContent.includes('Pincode seems to be for') && !codServiceable && allServiceablePincodesCOD.size > 0){ statusMessage.textContent = 'Cash on Delivery not available. Online Payment is available.'; statusMessage.className = 'error'; }
+                                else if (allServiceablePincodesCOD.size === 0 && !statusMessage.textContent.startsWith('Error')) { statusMessage.textContent = 'Cash on Delivery is currently unavailable for all areas.'; statusMessage.className = 'error';}
+                                if (codPaymentRadio.checked) { onlinePaymentRadio.checked = true; } 
+                           }
+                        } else { // Pincode-state was invalid
+                            if (codPaymentRadio.checked) { onlinePaymentRadio.checked = true; }
+                        }
+                   } else if (pin.length > 0) { showValidationError(pincodeInput, 'Pincode must be 6 digits.'); if (!statusMessage.textContent.includes('unavailable for all areas')){ statusMessage.textContent = 'Invalid PIN code format.'; statusMessage.className = 'error'; } if (codPaymentRadio.checked) onlinePaymentRadio.checked = true; }
+                   else { if (statusMessage.textContent.includes('PIN') || statusMessage.textContent.includes('Delivery available')) { statusMessage.textContent = ''; } if (!onlinePaymentRadio.checked && !codPaymentRadio.checked && !onlinePaymentRadio.disabled) { onlinePaymentRadio.checked = true; } else if (codPaymentRadio.checked) { onlinePaymentRadio.checked = true; } }
+                   if (allServiceablePincodesCOD.size === 0 && pincodeDataLoaded) { 
+                        codPaymentRadio.disabled = true; codPaymentOptionGroup.classList.add('disabled');
+                        if (!onlinePaymentRadio.checked && !onlinePaymentRadio.disabled) onlinePaymentRadio.checked = true;
+                        if (!statusMessage.textContent.startsWith("Error loading")) {
+                            statusMessage.textContent = 'Cash on Delivery is currently unavailable for all areas.';
+                            statusMessage.className = 'error';
+                        }
+                   }
+                    updatePaymentMethodDisplay(); updatePlaceOrderButtonState();
+                });
+                pincodeInput.addEventListener('input', () => { clearValidationError(pincodeInput); if (statusMessage.textContent.includes('PIN') || statusMessage.textContent.includes('Delivery available')) { statusMessage.textContent = ''; } let codWasChecked = codPaymentRadio.checked; codPaymentRadio.disabled = true; codPaymentOptionGroup.classList.add('disabled'); if (codWasChecked) { if (!onlinePaymentRadio.disabled) { onlinePaymentRadio.checked = true; } else { onlinePaymentRadio.checked = false; } updatePaymentMethodDisplay(); } updatePlaceOrderButtonState(); if (pincodeInput.value.trim().length === 6) { setTimeout(() => { pincodeInput.dispatchEvent(new Event('blur')); }, 150); } });
+            }
+            if (stateSelect && pincodeInput) { stateSelect.addEventListener('change', () => { clearValidationError(stateSelect); if (pincodeInput.value.trim().length === 6) { pincodeInput.dispatchEvent(new Event('blur')); } updatePlaceOrderButtonState(); }); }
+
+            function updatePaymentMethodDisplay() { const selectedOption = document.querySelector('input[name="paymentOption"]:checked'); if (selectedOption) { paymentMethodHiddenInput.value = selectedOption.value === 'Cash on delivery' ? 'Cash on delivery ✅' : selectedOption.value; finalPriceHiddenInput.value = selectedOption.value === 'Online Payment' ? onlinePrice : codPrice; } else { paymentMethodHiddenInput.value = ''; finalPriceHiddenInput.value = ''; } if(selectedCartTotalPriceSpan) selectedCartTotalPriceSpan.textContent = finalPriceHiddenInput.value ? `₹${finalPriceHiddenInput.value}` : '₹--'; document.querySelectorAll('.payment-option-group').forEach(group => group.classList.remove('selected')); if (selectedOption && selectedOption.closest('.payment-option-group')) { selectedOption.closest('.payment-option-group').classList.add('selected'); } const paymentErrorSpan = document.getElementById('payment-method-error'); if (selectedOption && !selectedOption.disabled && paymentErrorSpan && paymentErrorSpan.style.display !== 'none') { paymentErrorSpan.textContent = ''; paymentErrorSpan.style.display = 'none'; } updatePlaceOrderButtonState(); }
+            
+            function updatePlaceOrderButtonState() {
+                 const selectedOption = document.querySelector('input[name="paymentOption"]:checked');
+                 let basicFormFilled = true;
+                 ['full-name', 'phone', 'address', 'pincode', 'state'].forEach(id => {
+                     const inputEl = document.getElementById(id);
+                     if (inputEl && inputEl.hasAttribute('required') && inputEl.value.trim() === '') {
+                         basicFormFilled = false;
+                     }
+                 });
+                 if (pincodeInput && pincodeInput.value.trim().length > 0 && pincodeInput.value.trim().length !== 6) { basicFormFilled = false; }
+                 if (document.getElementById('phone').value.trim().length > 0 && document.getElementById('phone').value.trim().length !== 10) { basicFormFilled = false; }
+
+                 let paymentOptionValidAndSelected = false;
+                 if (selectedOption) {
+                    if (selectedOption.id === 'onlinePaymentRadio' && !selectedOption.disabled) {
+                        paymentOptionValidAndSelected = true;
+                    } else if (selectedOption.id === 'codPaymentRadio' && !selectedOption.disabled) {
+                        paymentOptionValidAndSelected = true;
+                    }
+                 }
+
+                 if (basicFormFilled && paymentOptionValidAndSelected) {
+                     placeOrderBtn.disabled = false;
+                      if (!placeOrderBtn.classList.contains('highlight')) {
+                           placeOrderBtn.classList.add('highlight');
+                      }
+                 } else {
+                     placeOrderBtn.disabled = true;
+                     placeOrderBtn.classList.remove('highlight');
+                 }
+            }
+
+            document.querySelectorAll('input[name="paymentOption"]').forEach(radio => radio.addEventListener('change', updatePaymentMethodDisplay));
+            document.querySelectorAll('.payment-option-group').forEach(group => { group.addEventListener('click', (event) => { if (event.target.tagName === 'LABEL' && event.target.htmlFor) { const radioInGroup = group.querySelector('input[type="radio"]'); if (radioInGroup && event.target.htmlFor === radioInGroup.id) return; } const radio = group.querySelector('input[type="radio"]'); if (radio && !radio.disabled) { if (!radio.checked) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); } } }); });
+            checkoutForm.querySelectorAll('input, select, textarea').forEach(input => { input.addEventListener('input', () => { clearValidationError(input); updatePlaceOrderButtonState(); }); input.addEventListener('change', () => { clearValidationError(input); updatePlaceOrderButtonState(); });});
+
+            if (placeOrderBtn) {
+                 placeOrderBtn.addEventListener('click', async () => {
+                    clearAllValidationErrors(); let isFormValid = true; let firstInvalidElement = null;
+                    checkoutForm.querySelectorAll('input[required]:not([type="radio"]), textarea[required], select[required]').forEach(input => { clearValidationError(input); if (!input.checkValidity() || (input.value.trim() === '' && input.hasAttribute('required'))) { isFormValid = false; let msg = input.validationMessage || 'This field is required.'; if (input.id === 'phone' && input.value.trim().length > 0 && input.value.trim().length !== 10) msg = "Please enter a valid 10-digit phone number."; if (input.id === 'pincode' && input.value.trim().length > 0 && input.value.trim().length !== 6) msg = "Pincode must be 6 digits."; if (input.tagName === 'SELECT' && input.value === "") msg = 'Please select an option.'; showValidationError(input, msg); if (!firstInvalidElement) firstInvalidElement = input; } });
+                    if (pincodeInput && pincodeInput.value.trim().length === 6) { if (stateSelect.value) { const stateValidationResult = validatePincodeState(pincodeInput.value.trim(), stateSelect.value); if (!stateValidationResult.isValid) { isFormValid = false; showValidationError(pincodeInput, stateValidationResult.message); if (!firstInvalidElement) firstInvalidElement = pincodeInput; } } if (isFormValid) { const btnOriginalText = placeOrderBtn.innerHTML; placeOrderBtn.disabled = true; placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...'; pincodeInput.dispatchEvent(new Event('blur')); await new Promise(resolve => setTimeout(resolve, 400)); placeOrderBtn.innerHTML = btnOriginalText; if (pincodeInput.classList.contains('is-invalid')) { isFormValid = false; if (!firstInvalidElement) firstInvalidElement = pincodeInput; } } }
+                    const selectedPayment = document.querySelector('input[name="paymentOption"]:checked');
+                    if (!selectedPayment) { isFormValid = false; const paymentErrorSpan = document.getElementById('payment-method-error'); if (paymentErrorSpan) { paymentErrorSpan.textContent = 'Please select a payment method.'; paymentErrorSpan.style.display = 'block'; } if (!firstInvalidElement) firstInvalidElement = document.querySelector('.payment-options h3') || onlinePaymentOptionGroup; }
+                    else if (selectedPayment.id === 'codPaymentRadio' && selectedPayment.disabled) { isFormValid = false; const paymentErrorSpan = document.getElementById('payment-method-error'); let errMsg = 'Cash on Delivery is not available for this pincode/state. Please choose Online Payment.'; if (allServiceablePincodesCOD.size === 0 && pincodeDataLoaded) errMsg = 'Cash on Delivery is currently unavailable for all areas.'; if (paymentErrorSpan) { paymentErrorSpan.textContent = errMsg; paymentErrorSpan.style.display = 'block';} if (!firstInvalidElement) firstInvalidElement = document.querySelector('.payment-options h3') || codPaymentOptionGroup; if (pincodeInput && !pincodeInput.classList.contains('is-invalid')) showValidationError(pincodeInput, 'COD not available for this pincode/state.'); }
+                    
+                    if (!isFormValid) { if (!statusMessage.textContent.includes('unavailable for all areas') && !statusMessage.textContent.startsWith('Error loading')) { statusMessage.textContent = statusMessage.textContent || 'Please fix the errors above.'; statusMessage.className = 'error'; } if (firstInvalidElement) { if (firstInvalidElement.scrollIntoView) firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); const focusEl = (firstInvalidElement.tagName === 'INPUT' || firstInvalidElement.tagName === 'SELECT' || firstInvalidElement.tagName === 'TEXTAREA') ? firstInvalidElement : firstInvalidElement.querySelector('input, select, textarea') || firstInvalidElement; if(focusEl && typeof focusEl.focus === 'function') setTimeout(() => focusEl.focus(), 100); } updatePlaceOrderButtonState(); return; }
+
+                    placeOrderBtn.disabled = true; placeOrderBtn.classList.remove('highlight');
+                    placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    if (!statusMessage.textContent.includes('unavailable for all areas')) { statusMessage.textContent = 'Processing your order...'; statusMessage.className = ''; }
+                    
+                    const formDataForGoogle = new FormData();
+                    formDataForGoogle.append(GF_NAME_ENTRY, document.getElementById('full-name').value.trim());
+                    formDataForGoogle.append(GF_PHONE_ENTRY, document.getElementById('phone').value.trim());
+                    formDataForGoogle.append(GF_ADDRESS_ENTRY, document.getElementById('address').value.trim());
+                    formDataForGoogle.append(GF_PINCODE_ENTRY, pincodeInput.value.trim());
+                    formDataForGoogle.append(GF_STATE_ENTRY, stateSelect.value);
+                    formDataForGoogle.append(GF_PRODUCT_NAME_ENTRY, productNameHiddenInput.value);
+                    formDataForGoogle.append(GF_ORDER_ID_ENTRY, orderIdHiddenInput.value);
+                    formDataForGoogle.append(GF_PAYMENT_METHOD_ENTRY, paymentMethodHiddenInput.value);
+                    formDataForGoogle.append(GF_FINAL_PRICE_ENTRY, finalPriceHiddenInput.value);
+                    
+                    const orderDataForHistory = { 
+                        id: orderIdHiddenInput.value, 
+                        name: document.getElementById('full-name').value.trim(), 
+                        phone: document.getElementById('phone').value.trim(), 
+                        address: document.getElementById('address').value.trim(), 
+                        pincode: pincodeInput.value.trim(), 
+                        state: stateSelect.value, 
+                        productName: productNameHiddenInput.value, 
+                        paymentMethod: paymentMethodHiddenInput.value, 
+                        finalPrice: finalPriceHiddenInput.value 
+                    };
+                    const selectedPaymentValue = paymentMethodHiddenInput.value;
+
+                    if (selectedPaymentValue === 'Cash on delivery ✅') {
+                         sendToGoogleForm(formDataForGoogle).then(success => { 
+                             if (success) { 
+                                saveOrderToHistory(orderDataForHistory); 
+                                triggerSuccessAnimation(); 
+                            } else { 
+                                statusMessage.textContent = 'Order could not be saved. Contact support. Order ID: ' + orderIdHiddenInput.value; 
+                                statusMessage.className = 'error'; 
+                                placeOrderBtn.disabled = false; 
+                                placeOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>Place Order'; 
+                                updatePlaceOrderButtonState(); 
+                            } 
+                        });
+                    } else if (selectedPaymentValue === 'Online Payment') {
+                        const googleFormSubmissionSuccess = await sendToGoogleForm(formDataForGoogle);
+                        if (googleFormSubmissionSuccess) {
+                            console.log("Order details submitted to Google Form for Online Payment (buy.html).");
+                            saveTempOrderData(); 
+                            const amountForPayPage = finalPriceHiddenInput.value;
+                            const orderIdForPayPage = orderIdHiddenInput.value;
+                            const customerNameForPayPage = document.getElementById('full-name').value.trim();
+                            const productNameForPayPage = productNameHiddenInput.value; // From hidden input
+                            const customerPhoneForPayPage = document.getElementById('phone').value.trim();
+
+                            window.location.href = `${targetPayPage}?orderId=${orderIdForPayPage}&amount=${amountForPayPage}&productName=${encodeURIComponent(productNameForPayPage)}&customerName=${encodeURIComponent(customerNameForPayPage)}&customerPhone=${customerPhoneForPayPage}`;
+                        } else {
+                            statusMessage.textContent = 'Could not pre-register order. Please try again or contact support. Order ID: ' + orderIdHiddenInput.value;
+                            statusMessage.className = 'error';
+                            placeOrderBtn.disabled = false;
+                            placeOrderBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>Place Order';
+                            updatePlaceOrderButtonState();
+                        }
+                    } else { 
+                        statusMessage.textContent = 'Invalid payment method. Please try again.'; 
+                        statusMessage.className = 'error'; 
+                        const paymentHeading = document.querySelector('.payment-options h3'); 
+                        if (paymentHeading?.scrollIntoView) { paymentHeading.scrollIntoView({ behavior: 'smooth', block: 'center' }); } 
+                        updatePlaceOrderButtonState(); 
+                    }
+                });
+            }
+            
+            if (getQueryParam('payment') !== 'success') { 
+                if (allServiceablePincodesCOD.size === 0 && pincodeDataLoaded) { 
+                    codPaymentRadio.disabled = true; 
+                    codPaymentOptionGroup.classList.add('disabled'); 
+                    if (!onlinePaymentRadio.checked && !onlinePaymentRadio.disabled) { onlinePaymentRadio.checked = true; } 
+                } else if (!pincodeInput || pincodeInput.value.trim().length !== 6) { 
+                    codPaymentRadio.disabled = true; 
+                    codPaymentOptionGroup.classList.add('disabled'); 
+                    if (!onlinePaymentRadio.checked && !onlinePaymentRadio.disabled) { onlinePaymentRadio.checked = true; } 
+                } 
+                updatePaymentMethodDisplay(); 
+                updatePlaceOrderButtonState(); 
+            }
+        });
+    </script>
+</body>
+</html

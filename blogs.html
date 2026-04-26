@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Blog Feed | Discount Hub</title>
+<meta name="description" content="Read the latest news, updates, and offers on Discount Hub.">
+<meta property="og:title" content="Discount Hub Blog">
+<meta property="og:image" content="dh.png">
+<meta name="theme-color" content="#4F46E5">
+<link rel="icon" href="dh.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* --- VARIABLES --- */
+    :root {
+        --primary: #4F46E5; 
+        --primary-dim: rgba(79, 70, 229, 0.1);
+        --text-main: #0f172a;
+        --text-body: #334155;
+        --bg-body: #ffffff;
+        --nav-height: 70px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg-body);
+        color: var(--text-main);
+        padding-top: var(--nav-height);
+        padding-bottom: 100px;
+        overflow-x: hidden;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* --- SCROLL PROGRESS --- */
+    .progress-bar { position: fixed; top: var(--nav-height); left: 0; height: 4px; background: var(--primary); width: 0%; z-index: 1001; transition: 0.1s; box-shadow: 0 0 15px var(--primary); }
+
+    /* --- NAVBAR --- */
+    .navbar {
+        position: fixed; top: 0; left: 0; width: 100%; height: var(--nav-height);
+        background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000;
+        display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo i { color: var(--primary); }
+    .nav-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid #f1f5f9; background: #f8fafc; color: var(--text-main); font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+    .nav-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: rotate(10deg); }
+
+    /* --- HEADER AD (320x50) --- */
+    .header-ad-container {
+        width: 100%; display: flex; justify-content: center; align-items: center;
+        padding: 10px 0; background: #fcfcfc; border-bottom: 1px dashed #e2e8f0;
+    }
+
+    /* --- CUSTOM "D" LOADING ANIMATION --- */
+    #loading { 
+        position: fixed; inset: 0; background: white; z-index: 7000; 
+        display: flex; justify-content: center; align-items: center; 
+        flex-direction: column; gap: 20px; 
+    }
+    
+    /* The "D" Bag Construction */
+    .d-logo-loader {
+        position: relative;
+        width: 80px; height: 90px;
+        animation: floatBag 2s ease-in-out infinite;
+    }
+    /* Bag Handle */
+    .d-logo-loader::before {
+        content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+        width: 40px; height: 30px;
+        border: 4px solid #0f172a; border-bottom: none;
+        border-radius: 20px 20px 0 0;
+        z-index: 1;
+    }
+    /* Bag Body */
+    .d-bag-body {
+        position: absolute; bottom: 0; left: 0; width: 100%; height: 75px;
+        background: linear-gradient(135deg, #00C6FF, #0072FF); /* Blue Gradient */
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 114, 255, 0.3);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 2;
+    }
+    /* The "D" Letter */
+    .d-bag-body::after {
+        content: 'D';
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 50px;
+        color: white;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    }
+    .loading-text { font-family: 'Outfit'; font-weight: 600; color: #334155; font-size: 1.1rem; letter-spacing: 1px; }
+
+    @keyframes floatBag {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* ============================
+       LISTING VIEW STYLES 
+       ============================ */
+    .listing-container {
+        max-width: 1000px; margin: 0 auto; padding: 20px;
+        display: none; /* Hidden by default */
+        opacity: 0; transition: opacity 0.5s;
+    }
+
+    /* Listing Search */
+    .list-search-wrap {
+        position: relative; margin-bottom: 25px;
+    }
+    .list-search-input {
+        width: 100%; padding: 18px 20px 18px 55px;
+        border-radius: 16px; border: 2px solid #e2e8f0;
+        font-size: 1.1rem; font-family: 'Outfit', sans-serif; font-weight: 600;
+        outline: none; transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .list-search-input:focus { border-color: var(--primary); box-shadow: 0 4px 20px var(--primary-dim); }
+    .list-search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.2rem; }
+    
+    /* Filters */
+    .filters-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 30px; scrollbar-width: none; }
+    .filter-chip {
+        padding: 8px 20px; border-radius: 50px; background: #f1f5f9; 
+        color: #64748b; font-weight: 700; font-size: 0.9rem; white-space: nowrap;
+        border: 1px solid transparent; cursor: pointer; transition: 0.3s;
+    }
+    .filter-chip.active { background: var(--primary); color: white; box-shadow: 0 4px 10px var(--primary-dim); }
+
+    /* Grid */
+    .blogs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+    
+    /* Listing Card */
+    .blog-card {
+        background: white; border-radius: 16px; overflow: hidden;
+        border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: 0.3s; cursor: pointer; display: flex; flex-direction: column;
+        position: relative;
+    }
+    .blog-card:hover { transform: translateY(-5px); border-color: var(--primary-dim); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+    
+    /* Featured Badge Style */
+    .featured-badge {
+        position: absolute; top: 12px; right: 12px;
+        background: var(--primary); color: white;
+        font-size: 0.7rem; font-weight: 800; padding: 4px 10px;
+        border-radius: 20px; text-transform: uppercase;
+        letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 10; display: flex; align-items: center; gap: 4px;
+    }
+
+    .bc-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+    .bc-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .bc-cat { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; margin-bottom: 8px; }
+    .bc-title { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; line-height: 1.3; }
+    .bc-meta { margin-top: auto; font-size: 0.85rem; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f8fafc; padding-top: 15px; }
+
+    /* Feed Ad (320x50) */
+    .feed-ad-container {
+        grid-column: 1 / -1; /* Span full width */
+        display: flex; justify-content: center; align-items: center;
+        margin: 20px 0; padding: 10px; background: #fdfdfd; 
+        border: 1px dashed #e2e8f0; border-radius: 12px;
+    }
+
+    /* ============================
+       SINGLE BLOG STYLES (Existing)
+       ============================ */
+    .blog-container { max-width: 850px; margin: 0 auto; padding: 30px 20px; display: none; opacity: 0; transition: 1s; }
+
+    .blog-header { text-align: center; margin-bottom: 30px; }
+    .blog-cat-pill { display: inline-block; padding: 8px 18px; background: var(--primary-dim); color: var(--primary); border-radius: 50px; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+    .blog-title { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.2; color: var(--text-main); margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .blog-meta { color: #64748b; font-size: 0.95rem; font-weight: 600; display: flex; justify-content: center; gap: 20px; align-items: center; }
+    .blog-meta i { color: var(--primary); margin-right: 5px; }
+
+    .featured-image-box { 
+        margin: 35px 0; position: relative; padding: 6px; 
+        aspect-ratio: 16 / 9; 
+        border-radius: 20px;
+        background: linear-gradient(45deg, var(--primary), transparent);
+        box-shadow: 0 10px 40px -10px var(--primary-dim);
+    }
+    .featured-image { 
+        width: 100%; height: 100%; border-radius: 16px; 
+        object-fit: cover; display: block; background: #eee;
+    }
+
+    .blog-content { font-size: 1.15rem; line-height: 1.85; color: var(--text-body); }
+    .blog-content h2 { font-family: 'Outfit', sans-serif; font-size: 1.9rem; font-weight: 800; margin: 45px 0 20px; color: var(--text-main); position: relative; padding-left: 15px; }
+    .blog-content h2::before { content: ''; position: absolute; left: 0; top: 5px; bottom: 5px; width: 5px; background: var(--primary); border-radius: 10px; }
+    .blog-content p { margin-bottom: 25px; }
+    .blog-content ul { padding-left: 20px; margin-bottom: 25px; list-style-type: none; }
+    .blog-content li { margin-bottom: 12px; position: relative; padding-left: 25px; }
+    .blog-content li::before { content: '✔'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+    .blog-content img { width: 100%; border-radius: 12px; margin: 30px 0; border: 2px solid var(--primary-dim); }
+    .blog-content a { color: var(--primary); text-decoration: none; font-weight: 700; border-bottom: 2px solid var(--primary-dim); transition: 0.2s; }
+    .blog-content a:hover { background: var(--primary-dim); }
+
+    /* Single Blog Ads */
+    .ad-slot-wrapper {
+        margin: 40px 0; padding: 20px 0;
+        background: #fdfdfd; border: 1px dashed #e2e8f0; border-radius: 16px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; overflow: hidden;
+    }
+    .ad-label { font-size: 0.7rem; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+    /* Related Posts */
+    .related-section { margin-top: 60px; padding-top: 50px; border-top: 2px dashed #e2e8f0; }
+    .section-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 30px; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+    .related-card { 
+        background: white; border-radius: 16px; overflow: hidden; 
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); transition: 0.3s; cursor: pointer; 
+        border: 1px solid #f1f5f9; position: relative;
+    }
+    .related-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); border-color: var(--primary); }
+    .related-img { width: 100%; height: 180px; object-fit: cover; }
+    .related-info { padding: 20px; }
+    .related-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; line-height: 1.4; color: var(--text-main); }
+    .related-views { font-size: 0.85rem; color: var(--primary); font-weight: 600; background: var(--primary-dim); padding: 4px 10px; border-radius: 20px; display: inline-block; }
+
+    /* --- STICKY FOOTER AD (320x50) --- */
+    .sticky-ad-footer {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: white; padding: 10px 0; z-index: 9999;
+        display: flex; justify-content: center; align-items: center;
+        border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    }
+
+    /* --- SHARE FAB (Only for Single) --- */
+    .share-fab {
+        position: fixed; bottom: 100px; right: 20px;
+        width: 55px; height: 55px; background: var(--text-main); color: white;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 4000;
+        cursor: pointer; transition: 0.3s; display: none; /* Hidden on list */
+    }
+    .share-fab:hover { transform: scale(1.1) rotate(20deg); background: var(--primary); }
+
+    /* --- SEARCH OVERLAY (For Single Page Access) --- */
+    .search-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.98); z-index: 6000;
+        padding: 20px; display: flex; flex-direction: column;
+        opacity: 0; pointer-events: none; transition: 0.3s;
+    }
+    .search-overlay.active { opacity: 1; pointer-events: all; }
+    .search-header { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    .search-input { 
+        width: 100%; padding: 20px; border: 2px solid var(--primary); 
+        border-radius: 20px; font-size: 1.2rem; outline: none; 
+        background: #fff; color: var(--text-main); font-family: 'Outfit', sans-serif; font-weight: 700;
+    }
+    .search-results { margin-top: 20px; overflow-y: auto; flex: 1; }
+    .search-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s; }
+    .search-item:hover { background: var(--primary-dim); }
+    .search-item img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; border: 1px solid #e2e8f0; }
+    .search-item h4 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); line-height: 1.3; }
+
+    @media (min-width: 768px) {
+        .blog-container, .listing-container { padding: 50px; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <div id="loading">
+        <div class="d-logo-loader">
+            <div class="d-bag-body"></div>
+        </div>
+        <div class="loading-text">Loading Discount Hub...</div>
+    </div>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo"><i class="fas fa-bolt"></i> Discount Hub</a>
+        <div style="display:flex; gap:12px;">
+            <button class="nav-btn" id="nav-search-btn" onclick="openSearch()"><i class="fas fa-search"></i></button>
+            <button class="nav-btn" onclick="goHome()"><i class="fas fa-home"></i></button>
+        </div>
+    </nav>
+
+    <div class="header-ad-container">
+        <script type="text/javascript">    
+          atOptions = {    
+              'key' : '8cafc2f6e9328d0fedb304019c0b7618',    
+              'format' : 'iframe',    
+              'height' : 50,    
+              'width' : 320,    
+              'params' : {}    
+          };    
+        </script>    
+        <script type="text/javascript" src="https://www.highperformanceformat.com/8cafc2f6e9328d0fedb304019c0b7618/invoke.js"></script>
+    </div>
+
+    <div class="search-overlay" id="search-overlay">
+        <div class="search-header">
+            <button class="nav-btn" onclick="closeSearch()"><i class="fas fa-times"></i></button>
+        </div>
+        <input type="text" class="search-input" id="search-box-overlay" placeholder="What are you looking for?">
+        <div class="search-results" id="search-results-overlay"></div>
+    </div>
+
+    <div class="listing-container" id="listing-content">
+        <div class="list-search-wrap">
+            <i class="fas fa-search list-search-icon"></i>
+            <input type="text" id="list-search-input" class="list-search-input" placeholder="Search blogs... (Press Enter)">
+        </div>
+        <div class="filters-scroll">
+            <div class="filter-chip active" onclick="filterBlogs('latest', this)">Latest</div>
+            <div class="filter-chip" onclick="filterBlogs('popular', this)">Most Viewed</div>
+            <div class="filter-chip" onclick="filterBlogs('oldest', this)">Oldest</div>
+        </div>
+        <div class="blogs-grid" id="blogs-grid">
+            </div>
+    </div>
+
+    <div class="blog-container" id="single-content">
+        <header class="blog-header">
+            <span class="blog-cat-pill" id="blog-cat">Category</span>
+            <h1 class="blog-title" id="blog-title"></h1>
+            <div class="blog-meta">
+                <i class="far fa-calendar-alt"></i> <span id="blog-date"></span> &nbsp;•&nbsp; 
+                <i class="far fa-eye"></i> <span id="blog-views"></span> Views
+            </div>
+        </header>
+
+        <div class="featured-image-box">
+            <img src="" id="blog-image" class="featured-image" alt="Cover">
+        </div>
+
+        <article class="blog-content" id="blog-body">
+            </article>
+
+        <section class="related-section">
+            <h3 class="section-title">Read Next</h3>
+            <div class="related-grid" id="related-grid"></div>
+        </section>
+    </div>
+
+    <div class="share-fab" id="share-fab" onclick="shareBlog()"><i class="fas fa-share-alt"></i></div>
+
+    <div class="sticky-ad-footer">
+        <script type="text/javascript">    
+          atOptions = {    
+              'key' : '8cafc2f6e9328d0fedb304019c0b7618',    
+              'format' : 'iframe',    
+              'height' : 50,    
+              'width' : 320,    
+              'params' : {}    
+          };    
+        </script>    
+        <script type="text/javascript" src="https://www.highperformanceformat.com/8cafc2f6e9328d0fedb304019c0b7618/invoke.js"></script>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc, increment, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDBZLE7xCgKuXmfl1i1ZSwl86Xko7TUalk",
+          authDomain: "discounthubadmin.firebaseapp.com",
+          projectId: "discounthubadmin",
+          storageBucket: "discounthubadmin.firebasestorage.app",
+          messagingSenderId: "610110627519",
+          appId: "1:610110627519:web:0593a19ddc34fb669ef00a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global store for list sorting
+        let allBlogsCache = [];
+        let currentFilter = 'latest';
+
+        // --- THEMES ---
+        const themes = [
+            { main: '#4F46E5', dim: 'rgba(79, 70, 229, 0.15)' }, 
+            { main: '#db2777', dim: 'rgba(219, 39, 119, 0.15)' }, 
+            { main: '#059669', dim: 'rgba(5, 150, 105, 0.15)' },
+            { main: '#d97706', dim: 'rgba(217, 119, 6, 0.15)' },
+            { main: '#7c3aed', dim: 'rgba(124, 58, 237, 0.15)' },
+            { main: '#0284c7', dim: 'rgba(2, 132, 199, 0.15)' } 
+        ];
+
+        function applyRandomTheme() {
+            const t = themes[Math.floor(Math.random() * themes.length)];
+            document.documentElement.style.setProperty('--primary', t.main);
+            document.documentElement.style.setProperty('--primary-dim', t.dim);
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', t.main);
+        }
+
+        // --- AD INJECTORS ---
+        function insertAd(id, type) {
+            const el = document.getElementById(id);
+            if(!el) return;
+            el.innerHTML = ''; 
+            if(type === '300') {
+                const s1 = document.createElement('script'); s1.type = 'text/javascript';
+                s1.innerHTML = `atOptions = { 'key' : '8dd9edf29e00b48ec158f307bc978211', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };`;
+                el.appendChild(s1);
+                const s2 = document.createElement('script'); s2.src = '//www.highperformanceformat.com/8dd9edf29e00b48ec158f307bc978211/invoke.js';
+                el.appendChild(s2);
+            } 
+            else if(type === 'native') {
+                const s1 = document.createElement('script'); s1.type = 'text/javascript';
+                s1.innerHTML = `atOptions = { 'key' : '8cafc2f6e9328d0fedb304019c0b7618', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };`;
+                el.appendChild(s1);
+                const s2 = document.createElement('script'); s2.src = '//www.highperformanceformat.com/8cafc2f6e9328d0fedb304019c0b7618/invoke.js';
+                el.appendChild(s2);
+            }
+        }
+
+        function formatViews(num) {
+            if(num >= 1000) return (num/1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        // --- NAVIGATION LOGIC ---
+        window.goHome = () => {
+            const params = new URLSearchParams(window.location.search);
+            // If on Single View, go to Listing
+            if(params.get('blog')) {
+                window.location.href = 'blogs.html'; 
+            } else {
+                // If on Listing, go to Index
+                window.location.href = 'index.html';
+            }
+        }
+
+        // --- HELPER: CHECK IF BLOG IS VALID FEATURED (Active & < 48 Hours) ---
+        function isFeaturedActive(blogData) {
+            if (!blogData.isFeatured) return false;
+            // 48 Hours in seconds = 172800
+            const nowSeconds = Date.now() / 1000;
+            const blogSeconds = blogData.createdAt ? blogData.createdAt.seconds : 0;
+            const diff = nowSeconds - blogSeconds;
+            // Return true only if marked featured AND created within last 48 hours
+            return diff < 172800;
+        }
+
+        // --- INIT & ROUTING ---
+        async function init() {
+            applyRandomTheme();
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('blog');
+
+            if (slug) {
+                // SINGLE MODE
+                document.getElementById('nav-search-btn').style.display = 'flex';
+                await loadSingleBlog(slug);
+            } else {
+                // LISTING MODE
+                document.getElementById('nav-search-btn').style.display = 'none'; // Search is on page
+                document.getElementById('share-fab').style.display = 'none';
+                await loadListing();
+            }
+        }
+
+        // ==========================================
+        // 1. LISTING LOGIC
+        // ==========================================
+        async function loadListing() {
+            document.title = "All Blogs | Discount Hub";
+            const grid = document.getElementById('blogs-grid');
+            const listContainer = document.getElementById('listing-content');
+
+            try {
+                // Fetch all blogs (Limit 50 for performance)
+                // Note: Filtering Drafts client-side to ensure index safety
+                const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"), limit(60));
+                const snap = await getDocs(q);
+                
+                allBlogsCache = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    // FILTER: Hide Drafts
+                    if (data.status === 'draft') return;
+                    
+                    allBlogsCache.push({ id: d.id, ...data });
+                });
+
+                // Apply initial Sort (Latest + Featured Priority)
+                filterBlogs('latest', document.querySelector('.filter-chip.active'));
+
+                document.getElementById('loading').style.display = 'none';
+                listContainer.style.display = 'block';
+                setTimeout(() => listContainer.style.opacity = '1', 10);
+
+            } catch (error) {
+                console.error("Listing Error:", error);
+                document.getElementById('loading').innerHTML = "Error loading blogs.";
+            }
+        }
+
+        function renderList(blogs) {
+            const grid = document.getElementById('blogs-grid');
+            grid.innerHTML = '';
+
+            let cardCount = 0;
+            blogs.forEach((b) => {
+                const date = b.createdAt ? new Date(b.createdAt.seconds*1000).toLocaleDateString() : 'Recent';
+                const featuredBadge = isFeaturedActive(b) 
+                    ? `<div class="featured-badge"><i class="fas fa-star"></i> Featured</div>` 
+                    : '';
+
+                // Add Blog Card
+                grid.innerHTML += `
+                <div class="blog-card" onclick="window.location.href='blogs.html?blog=${b.slug}'">
+                    ${featuredBadge}
+                    <img src="${b.image}" class="bc-img" loading="lazy">
+                    <div class="bc-body">
+                        <span class="bc-cat">${b.category || 'Article'}</span>
+                        <h3 class="bc-title">${b.title}</h3>
+                        <div class="bc-meta">
+                            <span><i class="far fa-calendar"></i> ${date}</span>
+                            <span><i class="far fa-eye"></i> ${formatViews(b.views || 0)}</span>
+                        </div>
+                    </div>
+                </div>`;
+
+                cardCount++;
+
+                // Inject Ad after every 2 cards
+                if(cardCount % 2 === 0) {
+                    const adId = `feed-ad-${cardCount}`;
+                    grid.innerHTML += `
+                    <div class="feed-ad-container">
+                        <div id="${adId}"></div>
+                    </div>`;
+                    setTimeout(() => insertAd(adId, 'native'), 500);
+                }
+            });
+
+            if(blogs.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; width:100%; grid-column:1/-1; padding:40px;"><h3>No blogs found.</h3></div>`;
+            }
+        }
+
+        // Filtering
+        window.filterBlogs = (type, el) => {
+            // Update Chips
+            if(el) {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            let sorted = [...allBlogsCache];
+
+            if(type === 'latest') {
+                // SORT: Featured (<48h) First, Then Date
+                sorted.sort((a,b) => {
+                    const aFeat = isFeaturedActive(a);
+                    const bFeat = isFeaturedActive(b);
+                    
+                    if (aFeat && !bFeat) return -1; // A comes first
+                    if (!aFeat && bFeat) return 1;  // B comes first
+                    
+                    // If both featured or both not, sort by date
+                    return b.createdAt.seconds - a.createdAt.seconds;
+                });
+            } else if (type === 'popular') {
+                sorted.sort((a,b) => (b.views||0) - (a.views||0));
+            } else if (type === 'oldest') {
+                sorted.sort((a,b) => a.createdAt.seconds - b.createdAt.seconds);
+            }
+            renderList(sorted);
+        };
+
+        // Listing Search (Enter Key or Typing)
+        const listInput = document.getElementById('list-search-input');
+        
+        listInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                e.target.blur(); // Hide keyboard
+            }
+        });
+
+        listInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allBlogsCache.filter(b => b.title.toLowerCase().includes(term));
+            // When searching, we keep the sort order of results
+            renderList(filtered);
+        });
+
+
+        // ==========================================
+        // 2. SINGLE BLOG LOGIC (Existing Preserved)
+        // ==========================================
+        async function loadSingleBlog(slug) {
+            const q = query(collection(db, "blogs"), where("slug", "==", slug));
+            const snap = await getDocs(q);
+
+            if (snap.empty) { alert("Blog not found"); window.location.href = 'blogs.html'; return; }
+
+            const docSnap = snap.docs[0];
+            const data = docSnap.data();
+
+            // CHECK DRAFT STATUS
+            if (data.status === 'draft') {
+                alert("This blog is currently unavailable.");
+                window.location.href = 'blogs.html';
+                return;
+            }
+
+            // 1. Increment View (Real)
+            updateDoc(doc(db, "blogs", docSnap.id), { views: increment(1) }).catch(err => console.log("View count error (Check Rules):", err));
+
+            // 2. Render Data
+            document.title = data.title;
+            document.getElementById('blog-title').innerText = data.title;
+            document.getElementById('blog-cat').innerText = data.category || "Article";
+            
+            document.getElementById('blog-views').innerText = formatViews((data.views || 0) + 1);
+            
+            document.getElementById('blog-date').innerText = new Date(data.createdAt.seconds*1000).toLocaleDateString();
+            document.getElementById('blog-image').src = data.image;
+
+            // Content & Ad Injection
+            const temp = document.createElement('div');
+            temp.innerHTML = data.content;
+            const nodes = Array.from(temp.children);
+            let html = "";
+            let pCount = 0;
+
+            nodes.forEach((node) => {
+                html += node.outerHTML;
+                if(node.tagName === 'P') {
+                    pCount++;
+                    if(pCount % 3 === 0) {
+                        const id = `ad-${pCount}`;
+                        const type = (pCount % 6 === 0) ? 'native' : '300';
+                        html += `
+                        <div class="ad-slot-wrapper">
+                            <span class="ad-label">ADVERTISEMENT</span>
+                            <div id="${id}"></div>
+                        </div>`;
+                        setTimeout(() => insertAd(id, type), 500);
+                    }
+                }
+            });
+
+            document.getElementById('blog-body').innerHTML = html;
+            
+            // Show Single Container
+            document.getElementById('loading').style.display = 'none';
+            const singleCont = document.getElementById('single-content');
+            singleCont.style.display = 'block';
+            document.getElementById('share-fab').style.display = 'flex';
+            setTimeout(() => singleCont.style.opacity = '1', 10);
+
+            loadRelated(docSnap.id);
+        }
+
+        async function loadRelated(currId) {
+            const grid = document.getElementById('related-grid');
+            const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"), limit(10)); // Fetch slightly more to account for drafts
+            const snap = await getDocs(q);
+            let c = 0;
+            snap.forEach(d => {
+                const b = d.data();
+                // FILTER: Hide Drafts in Related too
+                if(d.id !== currId && b.status !== 'draft' && c < 4) {
+                    grid.innerHTML += `
+                    <div class="related-card" onclick="window.location.href='blogs.html?blog=${b.slug}'">
+                        <img src="${b.image}" class="related-img">
+                        <div class="related-info">
+                            <h4 class="related-title">${b.title}</h4>
+                            <span class="related-views"><i class="fas fa-eye"></i> ${formatViews(b.views||0)}</span>
+                        </div>
+                    </div>`;
+                    c++;
+                }
+            });
+        }
+
+        // --- OVERLAY SEARCH (For Single Page) ---
+        window.openSearch = () => { document.getElementById('search-overlay').classList.add('active'); document.getElementById('search-box-overlay').focus(); }
+        window.closeSearch = () => document.getElementById('search-overlay').classList.remove('active');
+
+        document.getElementById('search-box-overlay').addEventListener('input', async (e) => {
+            const v = e.target.value.toLowerCase();
+            const res = document.getElementById('search-results-overlay');
+            res.innerHTML = '';
+            if(v.length < 2) return;
+            const snap = await getDocs(query(collection(db, "blogs")));
+            snap.forEach(d => {
+                const b = d.data();
+                // FILTER: Hide drafts in Search
+                if(b.status === 'draft') return;
+
+                if(b.title.toLowerCase().includes(v)) {
+                    res.innerHTML += `
+                    <div class="search-item" onclick="window.location.href='blogs.html?blog=${b.slug}'">
+                        <img src="${b.image}">
+                        <h4>${b.title}</h4>
+                    </div>`;
+                }
+            });
+        });
+
+        // --- SCROLL BAR ---
+        window.onscroll = () => {
+            let h = document.documentElement, b = document.body, st = 'scrollTop', sh = 'scrollHeight';
+            let p = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100;
+            document.getElementById('progress-bar').style.width = p + "%";
+        };
+
+        window.shareBlog = () => {
+            if(navigator.share) navigator.share({title:document.title, url:window.location.href});
+            else { navigator.clipboard.writeText(window.location.href); alert("Link Copied!"); }
+        };
+
+        init();
+    </script>
+</body>
+</html>

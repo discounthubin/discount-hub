@@ -1,0 +1,259 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Discount Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Base Styles (Consistent) --- */
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4d44db;
+            --accent-color: #ff6584;
+            --dark-color: #2d2d2d;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; color: var(--dark-color); line-height: 1.7; /* Slightly increased for readability */
+            background-color: var(--light-color); display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { width: 100%; max-width: 1000px; /* Adjusted for content */ margin: 0 auto; padding: 0 15px; }
+
+        /* --- Button Styles --- */
+        .btn {
+            display: inline-block; background-color: var(--primary-color); color: var(--white);
+            padding: 10px 25px; border: none; border-radius: 30px; cursor: pointer;
+            text-decoration: none; font-weight: 500; font-size: 15px; transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center;
+        }
+        .btn i { margin-right: 8px; }
+        .btn:hover { background-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); }
+
+
+        /* --- Navbar Styles (Minimal) --- */
+        .navbar { background-color: var(--white); box-shadow: var(--box-shadow); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; height: 60px; max-width: 1200px; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-color); text-decoration: none; white-space: nowrap; }
+        .nav-links { display: none; align-items: center; gap: 10px;} /* Placeholder, actual links are on index */
+        .nav-links a { text-decoration: none; color: var(--dark-color); font-weight: 500; font-size: 14px; padding: 5px 8px; border-radius: 5px;}
+        .nav-links a:hover { color: var(--primary-color); background-color: var(--light-gray); }
+        .mobile-menu-btn, .cart-icon, .search-bar { display: none; } /* Hidden on this page */
+
+        /* --- About Us Section --- */
+        .about-section {
+            padding-top: 100px; /* Space for fixed navbar */
+            padding-bottom: 60px;
+            flex-grow: 1;
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .about-header h1 {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .about-header p {
+            font-size: 18px;
+            color: var(--gray-color);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .about-content {
+            background-color: var(--white);
+            padding: 30px 35px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            animation: fadeInContent 0.6s ease-out;
+        }
+        @keyframes fadeInContent { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-block {
+            margin-bottom: 35px;
+        }
+        .content-block:last-child { margin-bottom: 0; }
+
+        .content-block h3 {
+            font-size: 22px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block; /* So border only spans text */
+        }
+         .content-block h3 i { margin-right: 10px; }
+
+        .content-block p {
+            font-size: 16px;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+        .content-block p:last-child { margin-bottom: 0; }
+
+        .content-block ul {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+        .content-block ul li {
+            font-size: 16px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            padding-left: 25px; /* Space for custom icon */
+            position: relative;
+        }
+        .content-block ul li::before { /* Custom bullet icon */
+            content: '\f058'; /* Font Awesome check-circle icon */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900; /* Solid icon */
+            color: var(--success-color);
+            position: absolute;
+            left: 0;
+            top: 2px; /* Adjust vertical alignment */
+            font-size: 15px;
+        }
+
+        .content-block .product-item strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .content-block .note {
+            font-style: italic;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        .content-block .email-link {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .content-block .email-link:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
+        .shop-now-cta {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        /* --- Footer Styles --- */
+        .footer { background-color: var(--dark-color); color: var(--light-gray); padding-top: 50px; margin-top: auto; flex-shrink: 0; }
+        .footer-bottom { background-color: rgba(0, 0, 0, 0.2); padding: 18px 0; margin-top: 40px; text-align: center; font-size: 13px; }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .about-header h1 { font-size: 28px; }
+            .about-header p { font-size: 16px; }
+            .content-block h3 { font-size: 20px; }
+            .content-block p, .content-block ul li { font-size: 15px; }
+        }
+        @media (max-width: 576px) {
+             .about-content { padding: 25px 20px; }
+             .about-header h1 { font-size: 24px; }
+             .about-header p { font-size: 15px; }
+             .content-block h3 { font-size: 18px; }
+             .content-block p, .content-block ul li { font-size: 14px; }
+             .content-block ul li { padding-left: 22px; } /* Adjust for smaller icon */
+             .content-block ul li::before { font-size: 14px; top: 1px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Discount Hub</a>
+            <!-- Minimal Navbar for About Page -->
+            <div class="nav-links">
+                 <a href="index.html">Home</a>
+                 <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- About Us Section -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-header">
+                <h1>About Us – Discount Hub</h1>
+                <p>Your go-to online store for high-quality electronics and fashion items at unbeatable prices.</p>
+            </div>
+
+            <div class="about-content">
+                <div class="content-block">
+                    <h3><i class="fas fa-bullseye"></i>Our Mission</h3>
+                    <p>Welcome to Discount Hub! We aim to provide customers with the latest tech and trendy products without burning a hole in their pockets. We believe in quality, trust, and affordability, ensuring you can shop smart.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3><i class="fas fa-store"></i>What We Sell</h3>
+                    <p class="product-item"><strong>EarPods Pro (NN branded)</strong> – High-quality earphones with premium sound at budget-friendly rates. Perfect for your daily audio needs.</p>
+                    <p class="product-item"><strong>AirPods Pro 2nd Generation</strong> – These are not Apple originals but high-performance alternatives offering great sound, noise isolation, and long battery life. Experience premium features without the premium price tag.</p>
+                </div>
+
+                <div class="content-block">
+                    <h3><i class="fas fa-undo-alt"></i>Our Return Policy</h3>
+                    <p>We offer a customer-friendly <strong>8 Days Return Policy</strong>. We want you to shop with confidence!</p>
+                    <ul>
+                        <li>Not Free returns for eligible items.</li>
+                        <li>Full refund processed within 8 days of delivery.</li>
+                        <li>Easy return process via WhatsApp or email.</li>
+                    </ul>
+                </div>
+
+                <div class="content-block">
+                    <h3><i class="fas fa-thumbs-up"></i>Why Shop With Us?</h3>
+                    <ul>
+                        <li><strong>Free Shipping:</strong> Enjoy free shipping on all orders, no minimum purchase required.</li>
+                        <li><strong>Reliable Quality:</strong> All products are tested to ensure they meet our quality standards.</li>
+                        <li><strong>Affordable Pricing:</strong> Get the best deals on the products you love.</li>
+                        <li><strong>Exciting Offers:</strong> Look out for regular discount offers and special ₹1 deals!</li>
+                        <li><strong>Dedicated Support:</strong> Our customer support team is here to help. Contact us via email at:
+                            <a href="mailto:discounthubofficial1@gmail.com" class="email-link">discounthubofficial1@gmail.com</a>.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="shop-now-cta">
+                    <a href="index.html" class="btn"><i class="fas fa-shopping-cart"></i> Shop Smart with Discount Hub!</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2024 Discount Hub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // No specific JavaScript needed for this static about page.
+        // Potential future JS:
+        // - Accordion for sections if content grows
+        // - Animations on scroll for content blocks
+        console.log("About Us page loaded.");
+    </script>
+</body>
+</html
